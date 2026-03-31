@@ -67,6 +67,22 @@ export default function Index({ posts, globalData }) {
   const activePost = postMap.get(activeSlug);
   const activeYear = activePost ? getDateParts(activePost.data.date).year : '';
 
+  const isTimelineRailVisible = () => {
+    const timelineRail = document.getElementById('timeline-rail');
+
+    if (!timelineRail) {
+      return false;
+    }
+
+    const timelineRailStyles = window.getComputedStyle(timelineRail);
+
+    return (
+      timelineRailStyles.display !== 'none' &&
+      timelineRailStyles.visibility !== 'hidden' &&
+      timelineRail.offsetParent !== null
+    );
+  };
+
   const getTimelineScrollTopForSlug = (slug) => {
     const timelineRail = document.getElementById('timeline-rail');
     const timelineItem = document.getElementById(`timeline-${slug}`);
@@ -155,6 +171,10 @@ export default function Index({ posts, globalData }) {
     }
 
     const preventDirectScroll = (event) => {
+      if (!isTimelineRailVisible()) {
+        return;
+      }
+
       if (event.target.closest('#timeline-rail')) {
         return;
       }
