@@ -1,0 +1,109 @@
+---
+title: "data_type"
+date: "2022-06-16T08:26:00+08:00"
+slug: "37919ccb"
+tags:
+  - "js"
+  - "data_type"
+summary: "面试官：说说JavaScript中的数据类型？存储上的差别？ 在 JavaScript 中，我们可以分成两种类型："
+cover: "/legacy/img/picfive/wallfive (10).png"
+---
+
+<h1 id="面试官：说说JavaScript中的数据类型？存储上的差别？">面试官：说说JavaScript中的数据类型？存储上的差别？</h1><p> <img src="https://static.vue-js.com/6d133f90-6463-11eb-ab90-d9ae814b240d.png"  alt="" /></p>
+<h2 id="前言">前言</h2><p>在<code>JavaScript</code>中，我们可以分成两种类型：</p>
+<ul>
+<li>基本类型</li>
+<li>复杂类型</li>
+</ul>
+<p>两种类型的区别是：存储位置不同</p>
+<h2 id="一、基本类型">一、基本类型</h2><p>基本类型主要为以下6种：</p>
+<ul>
+<li>Number</li>
+<li>String</li>
+<li>Boolean</li>
+<li>Undefined</li>
+<li>null</li>
+<li>symbol</li>
+</ul>
+<h3 id="Number">Number</h3><p>数值最常见的整数类型格式则为十进制，还可以设置八进制（零开头）、十六进制（0x开头）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> intNum = <span class="number">55</span> <span class="comment">// 10进制的55</span></span><br /><span class="line"><span class="keyword">let</span> num1 = <span class="number">070</span> <span class="comment">// 8进制的56</span></span><br /><span class="line"><span class="keyword">let</span> hexNum1 = <span class="number">0xA</span> <span class="comment">//16进制的10</span></span><br /></pre></td></tr></table></figure>
+<p>浮点类型则在数值汇总必须包含小数点，还可通过科学计数法表示</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> floatNum1 = <span class="number">1.1</span>;</span><br /><span class="line"><span class="keyword">let</span> floatNum2 = <span class="number">0.1</span>;</span><br /><span class="line"><span class="keyword">let</span> floatNum3 = <span class="number">.1</span>; <span class="comment">// 有效，但不推荐</span></span><br /><span class="line"><span class="keyword">let</span> floatNum = <span class="number">3.125e7</span>; <span class="comment">// 等于 31250000</span></span><br /></pre></td></tr></table></figure>
+<p>在数值类型中，存在一个特殊数值<code>NaN</code>，意为“不是数值”，用于表示本来要返回数值的操作失败了（而不是抛出错误）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">0</span>/<span class="number">0</span>); <span class="comment">// NaN</span></span><br /><span class="line"><span class="built_in">console</span>.log(-<span class="number">0</span>/+<span class="number">0</span>); <span class="comment">// NaN</span></span><br /></pre></td></tr></table></figure>
+<h3 id="Undefined">Undefined</h3><p><code>Undefined</code> 类型只有一个值，就是特殊值 <code>undefined</code>。当使用 <code>var</code>或 <code>let</code>声明了变量但没有初始化时，就相当于给变量赋予了 <code>undefined</code>值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> message;</span><br /><span class="line"><span class="built_in">console</span>.log(message == <span class="literal">undefined</span>); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>包含<code>undefined</code> 值的变量跟未定义变量是有区别的</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> message; <span class="comment">// 这个变量被声明了，只是值为 undefined</span></span><br /><span class="line"></span><br /><span class="line"><span class="built_in">console</span>.log(message); <span class="comment">// &quot;undefined&quot;</span></span><br /><span class="line"><span class="built_in">console</span>.log(age); <span class="comment">// 没有声明过这个变量，报错</span></span><br /></pre></td></tr></table></figure>
+<h3 id="String">String</h3><p>字符串可以使用双引号（”）、单引号（’）或反引号（`）标示</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> firstName = <span class="string">&quot;John&quot;</span>;</span><br /><span class="line"><span class="keyword">let</span> lastName = <span class="string">&#x27;Jacob&#x27;</span>;</span><br /><span class="line"><span class="keyword">let</span> lastName = <span class="string">`Jingleheimerschmidt`</span></span><br /></pre></td></tr></table></figure>
+<p>字符串是不可变的，意思是一旦创建，它们的值就不能变了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lang = <span class="string">&quot;Java&quot;</span>;</span><br /><span class="line">lang = lang + <span class="string">&quot;Script&quot;</span>;  <span class="comment">// 先销毁再创建</span></span><br /></pre></td></tr></table></figure>
+<h3 id="Null">Null</h3><p><code>Null</code>类型同样只有一个值，即特殊值 <code>null</code></p>
+<p>逻辑上讲， null 值表示一个空对象指针，这也是给<code>typeof</code>传一个 <code>null</code> 会返回 <code>&quot;object&quot;</code> 的原因</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> car = <span class="literal">null</span>;</span><br /><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> car); <span class="comment">// &quot;object&quot;</span></span><br /></pre></td></tr></table></figure>
+<p><code>undefined</code> 值是由 <code>null</code>值派生而来</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="literal">null</span> == <span class="literal">undefined</span>); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>只要变量要保存对象，而当时又没有那个对象可保存，就可用 <code>null</code>来填充该变量</p>
+<h3 id="Boolean">Boolean</h3><p><code>Boolean</code>（布尔值）类型有两个字面值： <code>true</code> 和<code>false</code></p>
+<p>通过<code>Boolean</code>可以将其他类型的数据转化成布尔值</p>
+<p>规则如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /></pre></td><td class="code"><pre><span class="line">数据类型      				转换为 <span class="literal">true</span> 的值      				转换为 <span class="literal">false</span> 的值</span><br /><span class="line"> <span class="built_in">String</span>        				 非空字符串          					<span class="string">&quot;&quot;</span> </span><br /><span class="line"> <span class="built_in">Number</span> 				非零数值（包括无穷值）						<span class="number">0</span> 、 <span class="literal">NaN</span> </span><br /><span class="line"> <span class="built_in">Object</span> 					 任意对象 							   <span class="literal">null</span></span><br /><span class="line">Undefined 					N/A （不存在） 						<span class="literal">undefined</span></span><br /></pre></td></tr></table></figure>
+<h3 id="Symbol">Symbol</h3><p>Symbol （符号）是原始值，且符号实例是唯一、不可变的。符号的用途是确保对象属性使用唯一标识符，不会发生属性冲突的危险</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> genericSymbol = <span class="built_in">Symbol</span>();</span><br /><span class="line"><span class="keyword">let</span> otherGenericSymbol = <span class="built_in">Symbol</span>();</span><br /><span class="line"><span class="built_in">console</span>.log(genericSymbol == otherGenericSymbol); <span class="comment">// false</span></span><br /><span class="line"></span><br /><span class="line"><span class="keyword">let</span> fooSymbol = <span class="built_in">Symbol</span>(<span class="string">&#x27;foo&#x27;</span>);</span><br /><span class="line"><span class="keyword">let</span> otherFooSymbol = <span class="built_in">Symbol</span>(<span class="string">&#x27;foo&#x27;</span>);</span><br /><span class="line"><span class="built_in">console</span>.log(fooSymbol == otherFooSymbol); <span class="comment">// false</span></span><br /></pre></td></tr></table></figure>
+<h2 id="二、引用类型">二、引用类型</h2><p>复杂类型统称为<code>Object</code>，我们这里主要讲述下面三种：</p>
+<ul>
+<li>Object</li>
+<li>Array</li>
+<li>Function</li>
+</ul>
+<h3 id="Object">Object</h3><p>创建<code>object</code>常用方式为对象字面量表示法，属性名可以是字符串或数值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = &#123;</span><br /><span class="line">    <span class="attr">name</span>: <span class="string">&quot;Nicholas&quot;</span>,</span><br /><span class="line">    <span class="string">&quot;age&quot;</span>: <span class="number">29</span>,</span><br /><span class="line">    <span class="number">5</span>: <span class="literal">true</span></span><br /><span class="line">&#125;;</span><br /></pre></td></tr></table></figure>
+<h3 id="Array">Array</h3><p><code>JavaScript</code>数组是一组有序的数据，但跟其他语言不同的是，数组中每个槽位可以存储任意类型的数据。并且，数组也是动态大小的，会随着数据添加而自动增长</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> colors = [<span class="string">&quot;red&quot;</span>, <span class="number">2</span>, &#123;<span class="attr">age</span>: <span class="number">20</span> &#125;]</span><br /><span class="line">colors.push(<span class="number">2</span>)</span><br /></pre></td></tr></table></figure>
+<h3 id="Function">Function</h3><p>函数实际上是对象，每个函数都是 <code>Function</code>类型的实例，而 <code>Function</code>也有属性和方法，跟其他引用类型一样</p>
+<p>函数存在三种常见的表达方式：</p>
+<ul>
+<li>函数声明</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数声明</span></span><br /><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span> (<span class="params">num1, num2</span>) </span>&#123;</span><br /><span class="line">    <span class="keyword">return</span> num1 + num2;</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<ul>
+<li>函数表达式</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> sum = <span class="function"><span class="keyword">function</span>(<span class="params">num1, num2</span>) </span>&#123;</span><br /><span class="line">    <span class="keyword">return</span> num1 + num2;</span><br /><span class="line">&#125;;</span><br /></pre></td></tr></table></figure>
+<ul>
+<li>箭头函数</li>
+</ul>
+<p>函数声明和函数表达式两种方式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> sum = <span class="function">(<span class="params">num1, num2</span>) =&gt;</span> &#123;</span><br /><span class="line">    <span class="keyword">return</span> num1 + num2;</span><br /><span class="line">&#125;;</span><br /></pre></td></tr></table></figure>
+<h3 id="其他引用类型">其他引用类型</h3><p>除了上述说的三种之外，还包括<code>Date</code>、<code>RegExp</code>、<code>Map</code>、<code>Set</code>等……</p>
+<h2 id="三、存储区别">三、存储区别</h2><p>基本数据类型和引用数据类型存储在内存中的位置不同：</p>
+<ul>
+<li><p>基本数据类型存储在栈中</p>
+</li>
+<li><p>引用类型的对象存储于堆中</p>
+</li>
+</ul>
+<p>当我们把变量赋值给一个变量时，解析器首先要确认的就是这个值是基本类型值还是引用类型值</p>
+<p>下面来举个例子</p>
+<h3 id="基本类型">基本类型</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">10</span>;</span><br /><span class="line"><span class="keyword">let</span> b = a; <span class="comment">// 赋值操作</span></span><br /><span class="line">b = <span class="number">20</span>;</span><br /><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// 10值</span></span><br /></pre></td></tr></table></figure>
+<p><code>a</code>的值为一个基本类型，是存储在栈中，将<code>a</code>的值赋给<code>b</code>，虽然两个变量的值相等，但是两个变量保存了两个不同的内存地址</p>
+<p>下图演示了基本类型赋值的过程：</p>
+<p> <img src="https://static.vue-js.com/906ffb90-6463-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<h3 id="引用类型">引用类型</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj1 = &#123;&#125;</span><br /><span class="line"><span class="keyword">var</span> obj2 = obj1;</span><br /><span class="line">obj2.name = <span class="string">&quot;Xxx&quot;</span>;</span><br /><span class="line"><span class="built_in">console</span>.log(obj1.name); <span class="comment">// xxx</span></span><br /></pre></td></tr></table></figure>
+<p>引用类型数据存放在内对内中，每个堆内存中有一个引用地址，该引用地址存放在栈中</p>
+<p><code>obj1</code>是一个引用类型，在赋值操作过程汇总，实际是将堆内存对象在栈内存的引用地址复制了一份给了<code>obj2</code>，实际上他们共同指向了同一个堆内存对象，所以更改<code>obj2</code>会对<code>obj1</code>产生影响</p>
+<p>下图演示这个引用类型赋值过程</p>
+<p> <img src="https://static.vue-js.com/a34bdd10-6463-11eb-ab90-d9ae814b240d.png"  alt="" /></p>
+<h3 id="小结">小结</h3><ul>
+<li>声明变量时不同的内存地址分配：<ul>
+<li>简单类型的值存放在栈中，在栈中存放的是对应的值</li>
+<li>引用类型对应的值存储在堆中，在栈中存放的是指向堆内存的地址</li>
+</ul>
+</li>
+<li>不同的类型数据导致赋值变量时的不同：<ul>
+<li>简单类型赋值，是生成相同的值，两个对象对应不同的地址</li>
+<li>复杂类型赋值，是将保存对象的内存地址赋值给另一个变量。也就是两个变量指向堆内存中同一个对象</li>
+</ul>
+</li>
+</ul>

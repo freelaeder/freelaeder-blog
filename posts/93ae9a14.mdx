@@ -1,0 +1,54 @@
+---
+title: "== 和 ==="
+date: "2022-05-20T11:31:00+08:00"
+slug: "93ae9a14"
+tags:
+  - "== 和 ==="
+  - "js面试"
+summary: "面试官：== 和 ===区别，分别在什么情况使用 等于操作符用两个等于号（ == ）表示，如果操作数相等，则会返回 true"
+cover: "/legacy/img/picsix/wallsix (5).png"
+---
+
+<h1 id="面试官：-和-区别，分别在什么情况使用">面试官：== 和 ===区别，分别在什么情况使用</h1><p> <img src="https://static.vue-js.com/51b208f0-68df-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<h2 id="一、等于操作符">一、等于操作符</h2><p>等于操作符用两个等于号（ == ）表示，如果操作数相等，则会返回 <code>true</code></p>
+<p>前面文章，我们提到在<code>JavaScript</code>中存在隐式转换。等于操作符（==）在比较中会先进行类型转换，再确定操作数是否相等</p>
+<p>遵循以下规则：</p>
+<p>如果任一操作数是布尔值，则将其转换为数值再比较是否相等</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="literal">true</span> == <span class="number">1</span>); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>如果一个操作数是字符串，另一个操作数是数值，则尝试将字符串转换为数值，再比较是否相等</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="string">&quot;55&quot;</span> == <span class="number">55</span>); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>如果一个操作数是对象，另一个操作数不是，则调用对象的 <code>valueOf()</code>方法取得其原始值，再根据前面的规则进行比较</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> obj = &#123;<span class="attr">valueOf</span>:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span> <span class="number">1</span>&#125;&#125;</span><br /><span class="line"><span class="keyword">let</span> result1 = (obj == <span class="number">1</span>); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p><code>null</code>和<code>undefined</code>相等</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="literal">null</span> == <span class="literal">undefined</span> ); <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>如果有任一操作数是 <code>NaN</code> ，则相等操作符返回 <code>false</code> </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="literal">NaN</span> == <span class="literal">NaN</span> ); <span class="comment">// false</span></span><br /></pre></td></tr></table></figure>
+<p>如果两个操作数都是对象，则比较它们是不是同一个对象。如果两个操作数都指向同一个对象，则相等操作符返回<code>true</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line">let obj1 = &#123;name:&quot;xxx&quot;&#125;</span><br /><span class="line">let obj2 = &#123;name:&quot;xxx&quot;&#125;</span><br /><span class="line">let result1 = (obj1 == obj2 ); // false</span><br /></pre></td></tr></table></figure>
+<p>下面进一步做个小结：</p>
+<ul>
+<li>两个都为简单类型，字符串和布尔值都会转换成数值，再比较</li>
+<li><p>简单类型与引用类型比较，对象转化成其原始类型的值，再比较</p>
+</li>
+<li><p>两个都为引用类型，则比较它们是否指向同一个对象</p>
+</li>
+<li><p>null 和 undefined 相等</p>
+</li>
+<li>存在 NaN 则返回 false</li>
+</ul>
+<h2 id="二、全等操作符">二、全等操作符</h2><p>全等操作符由 3 个等于号（ === ）表示，只有两个操作数在不转换的前提下相等才返回 <code>true</code>。即类型相同，值也需相同</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="string">&quot;55&quot;</span> === <span class="number">55</span>); <span class="comment">// false，不相等，因为数据类型不同</span></span><br /><span class="line"><span class="keyword">let</span> result2 = (<span class="number">55</span> === <span class="number">55</span>); <span class="comment">// true，相等，因为数据类型相同值也相同</span></span><br /></pre></td></tr></table></figure>
+<p><code>undefined</code> 和 <code>null</code> 与自身严格相等</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="literal">null</span> === <span class="literal">null</span>)  <span class="comment">//true</span></span><br /><span class="line"><span class="keyword">let</span> result2 = (<span class="literal">undefined</span> === <span class="literal">undefined</span>)  <span class="comment">//true</span></span><br /></pre></td></tr></table></figure>
+<h2 id="三、区别">三、区别</h2><p>相等操作符（==）会做类型转换，再进行值的比较，全等运算符不会做类型转换</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="string">&quot;55&quot;</span> === <span class="number">55</span>); <span class="comment">// false，不相等，因为数据类型不同</span></span><br /><span class="line"><span class="keyword">let</span> result2 = (<span class="number">55</span> === <span class="number">55</span>); <span class="comment">// true，相等，因为数据类型相同值也相同</span></span><br /></pre></td></tr></table></figure>
+<p><code>null</code> 和 <code>undefined</code> 比较，相等操作符（==）为<code>true</code>，全等为<code>false</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result1 = (<span class="literal">null</span> == <span class="literal">undefined</span> ); <span class="comment">// true</span></span><br /><span class="line"><span class="keyword">let</span> result2 = (<span class="literal">null</span>  === <span class="literal">undefined</span>); <span class="comment">// false</span></span><br /></pre></td></tr></table></figure>
+<h3 id="小结">小结</h3><p>相等运算符隐藏的类型转换，会带来一些违反直觉的结果</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /><span class="line">11</span><br /><span class="line">12</span><br /></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span> == <span class="string">&#x27;0&#x27;</span> <span class="comment">// false</span></span><br /><span class="line"><span class="number">0</span> == <span class="string">&#x27;&#x27;</span> <span class="comment">// true</span></span><br /><span class="line"><span class="number">0</span> == <span class="string">&#x27;0&#x27;</span> <span class="comment">// true</span></span><br /><span class="line"></span><br /><span class="line"><span class="literal">false</span> == <span class="string">&#x27;false&#x27;</span> <span class="comment">// false</span></span><br /><span class="line"><span class="literal">false</span> == <span class="string">&#x27;0&#x27;</span> <span class="comment">// true</span></span><br /><span class="line"></span><br /><span class="line"><span class="literal">false</span> == <span class="literal">undefined</span> <span class="comment">// false</span></span><br /><span class="line"><span class="literal">false</span> == <span class="literal">null</span> <span class="comment">// false</span></span><br /><span class="line"><span class="literal">null</span> == <span class="literal">undefined</span> <span class="comment">// true</span></span><br /><span class="line"></span><br /><span class="line"><span class="string">&#x27; \t\r\n&#x27;</span> == <span class="number">0</span> <span class="comment">// true</span></span><br /></pre></td></tr></table></figure>
+<p>但在比较<code>null</code>的情况的时候，我们一般使用相等操作符<code>==</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = &#123;&#125;;</span><br /><span class="line"></span><br /><span class="line"><span class="keyword">if</span>(obj.x == <span class="literal">null</span>)&#123;</span><br /><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;1&quot;</span>);  <span class="comment">//执行</span></span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<p>等同于下面写法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(obj.x === <span class="literal">null</span> || obj.x === <span class="literal">undefined</span>) &#123;</span><br /><span class="line">    ...</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<p>使用相等操作符（==）的写法明显更加简洁了</p>
+<p>所以，除了在比较对象属性为<code>null</code>或者<code>undefined</code>的情况下，我们可以使用相等操作符（==），其他情况建议一律使用全等操作符（===）</p>

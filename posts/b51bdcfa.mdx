@@ -1,0 +1,89 @@
+---
+title: "vue项目部署"
+date: "2022-06-17T07:33:00+08:00"
+slug: "b51bdcfa"
+tags:
+  - "vue3"
+  - "vue项目部署"
+summary: "服务器&#x20; 完整的vue项目"
+cover: "/legacy/img/wallseven/wallseven2.png"
+---
+
+<hr />
+<div class="tip bolt"><h4 id="准备工作">准备工作</h4></div>
+<ul>
+<li><p>服务器&#x20;</p>
+</li>
+<li><p>完整的vue项目</p>
+</li>
+</ul>
+<div class="tip key"><h4 id="整体流程描述">整体流程描述</h4></div>
+<ul>
+<li><p>打包自己的vue项目，并生成dist文件，并且压缩</p>
+</li>
+<li><p>服务器配置好宝塔面板</p>
+</li>
+<li><p>配置域名泛解析（目的为了添加更多的项目）</p>
+</li>
+<li><p>上传至服务器</p>
+</li>
+<li><p>配置nginx管理</p>
+</li>
+<li><p>完成发布</p>
+</li>
+</ul>
+<div class="tip warning faa-horizontal animated faa-fast"><h4 id="服务器配置宝塔">服务器配置宝塔</h4></div>
+<ul>
+<li><p>如果不会打包项目，就不用向下看了</p>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtMrj.png"  alt="" /></p>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHt8I0.png"  alt="" /></p>
+<ul>
+<li>宝塔地址&#x20;</li>
+</ul>
+<p><a target="_blank" rel="noopener external nofollow noreferrer" href="https://www.bt.cn/new/download.html">https://www.bt.cn/new/download.html</a></p>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtNzF.png"  alt="" /></p>
+<ul>
+<li><p>根据自己的服务器选择对应的命令回车</p>
+</li>
+<li><p>之后安装完毕之后会有账号密码，记得保存，记得保存</p>
+</li>
+<li><p>在地址栏输入自己的公网ip+:端口8888</p>
+</li>
+</ul>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtgzD.png"  alt="" /></p>
+<ul>
+<li>宝塔安装完毕</li>
+</ul>
+</li>
+</ul>
+<div class="tip warning faa-parent animated-hover"><p class="faa-horizontal"> #### 域名添加泛解析记录值</p></div>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtRQe.png"  alt="" /></p>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHt5dI.png"  alt="" /></p>
+<h4 id="上传至服务器">上传至服务器</h4><ul>
+<li>点击网站</li>
+</ul>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtHW8.png"  alt="" /></p>
+<ul>
+<li><p>比如 mm.freelaeder.cn   mm就是泛解析的前缀</p>
+</li>
+<li><p>来到文件</p>
+</li>
+</ul>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtXLj.png"  alt="" /></p>
+<ul>
+<li>浏览器输入如果出现这个，代表即将成功</li>
+</ul>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHtxwn.png"  alt="" /></p>
+<ul>
+<li>接着将你的vue传到该文件夹下面</li>
+</ul>
+<h4 id="配置nginx">配置nginx</h4><p><img src="https://s1.ax1x.com/2022/06/16/XHNpF0.png"  alt="" /></p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br /></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> / &#123; <span class="attribute">try_files</span> $uri $uri/ /index.html; &#125;</span><br /></pre></td></tr></table></figure>
+<p><img src="https://s1.ax1x.com/2022/06/16/XHNiSU.png"  alt="" /></p>
+<h4 id="发布服务器之后，刷新页面404解决">发布服务器之后，刷新页面404解决</h4><ul>
+<li>刷新页面404的原因</li>
+</ul>
+<ul>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="http://www.javashuo.com/article/p-gnqdvhvr-bp.html">http://www.javashuo.com/article/p-gnqdvhvr-bp.html</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://blog.csdn.net/weixin_40648700/article/details/114117846?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-114117846-blog-124570408.pc_relevant_default&amp;spm=1001.2101.3001.4242.2&amp;utm_relevant_index=4">https://blog.csdn.net/weixin_40648700/article/details/114117846?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-114117846-blog-124570408.pc_relevant_default&amp;spm=1001.2101.3001.4242.2&amp;utm_relevant_index=4</a></li>
+</ul>

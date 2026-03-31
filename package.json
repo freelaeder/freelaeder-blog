@@ -19,13 +19,15 @@
     "build": "next build",
     "start": "next start",
     "export": "next build && next export",
-    "lint": "next lint"
+    "lint": "next lint",
+    "import:hexo": "node scripts/import-hexo-posts.mjs"
   },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.9.0",
     "@tailwindcss/typography": "^0.5.19",
     "classnames": "^2.3.1",
     "gray-matter": "^4.0.3",
+    "marked": "^16.4.1",
     "next": "^16.0.8",
     "next-mdx-remote": "^6.0.0",
     "next-remote-watch": "2.0.0",

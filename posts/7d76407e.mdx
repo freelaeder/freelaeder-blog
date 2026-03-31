@@ -1,0 +1,25 @@
+---
+title: "How do I understand target and currenttarget"
+date: "2023-04-01T10:31:00+08:00"
+slug: "7d76407e"
+tags:
+  - "chatbox"
+  - "target"
+  - "currentTarget"
+summary: "currentTarget 和 target 的区别 event.currentTarget 和 event.target 都是 JavaScript 中处理事件的对象，它们之间的主要区别在于它们所指向的对象不同。"
+cover: "/legacy/img/wallseven/wallseven43.png"
+---
+
+<div class="tip bolt"><h4 id="currentTarget-和-target-的区别">currentTarget 和 target 的区别</h4></div>
+<p>event.currentTarget 和 event.target 都是 JavaScript 中处理事件的对象，它们之间的主要区别在于它们所指向的对象不同。</p>
+<h4 id="event-currentTarget：">event.currentTarget：</h4><p>event.currentTarget 代表绑定事件的元素，即事件监听器所绑定到的对象。当事件被触发时，event.currentTarget 引用的是监听器所绑定到的元素。在事件冒泡过程中，event.currentTarget 通常不会改变。</p>
+<h4 id="event-target：">event.target：</h4><p>event.target 代表触发事件的元素，在大多数情况下，event.target 和 event.currentTarget 是相同的，即事件被触发时，它们引用同一个元素对象。但在事件冒泡过程中，event.target 引用的是事件最开始触发的那个元素，而不是当前被处理的元素。在事件处理的过程中，event.target 可能会发生变化，具体取决于事件类型以及元素的结构。</p>
+<p>例如，当用户在表单中输入文本时，event.currentTarget 引用的是绑定表单元素的事件监听器，而 event.target 引用的是当前发生变化的 <code>&lt;input&gt;</code> 或 <code>&lt;textarea&gt;</code> 元素。</p>
+<p>而 event.currentTarget.value 和 event.target.value 的区别就在于它们所指向的对象不同，它们本质上都是表示事件对象中的一个属性。</p>
+<p>event.currentTarget.value 表示当前绑定事件的元素的值，例如，如果绑定的是输入框的 change 事件，则 event.currentTarget.value 表示当前输入框中的值。</p>
+<p>而 event.target.value 表示当前触发事件的元素的值，例如，如果用户在输入框中输入文本，event.target.value 表示输入框中的当前值。如果用户单击了 checkbox，event.target.value 表示 checkbox 的值（一般为 “on” 或 “off”）。</p>
+<p>在实际开发中，了解 event.currentTarget 和 event.target 的区别，以及它们对应的属性，对于正确处理事件非常重要。</p>
+<div class="note info simple"><h4 id="总结">总结</h4></div>
+<p>target 表示的是当前触发事件的 DOM 元素(事件触发的目标)。</p>
+<p>currentTarget 表示引用事件侦听器正在侦听的 DOM 元素(事件的真实注册者)。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /><span class="line">11</span><br /></pre></td><td class="code"><pre><span class="line">&lt;ul <span class="class"><span class="keyword">class</span></span>=<span class="string">&quot;todo-list&quot;</span>&gt;</span><br /><span class="line">  <span class="xml"><span class="tag">&lt;<span class="name">li</span> <span class="attr">class</span>=<span class="string">&quot;item&quot;</span>&gt;</span>Walk your dog<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span></span><br /><span class="line">&lt;/ul&gt;;</span><br /><span class="line"><span class="keyword">const</span> list = <span class="built_in">document</span>.querySelector(<span class="string">&quot;.todo-list&quot;</span>);</span><br /><span class="line"></span><br /><span class="line">list.addEventListener(<span class="string">&quot;click&quot;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br /><span class="line">  <span class="built_in">console</span>.log(e.target);</span><br /><span class="line">  <span class="comment">// Output: &lt;li class=&quot;item&quot;&gt;Walk your dog&lt;/li&gt;</span></span><br /><span class="line">  <span class="built_in">console</span>.log(e.currentTarget);</span><br /><span class="line">  <span class="comment">// Output: &lt;ul class=&quot;todo-list&quot;&gt;&lt;/ul&gt;</span></span><br /><span class="line">&#125;);</span><br /></pre></td></tr></table></figure>

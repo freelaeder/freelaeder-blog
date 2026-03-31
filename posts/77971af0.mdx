@@ -1,0 +1,19 @@
+---
+title: "ts报错解决持续更新"
+date: "2022-07-01T09:53:00+08:00"
+slug: "77971af0"
+tags:
+  - "ts报错解决持续更新"
+  - "typeScript"
+summary: "index.ts:4:3 - error TS2584: Cannot find name ‘console’ Cannot find name ‘console’ 或者没有console就直接没反应"
+cover: "/legacy/img/wallseven/wallseven26.png"
+---
+
+<div class="tip ban"><h4 id="index-ts-4-3-error-TS2584-Cannot-find-name-‘console’">index.ts:4:3 - error TS2584: Cannot find name ‘console’</h4></div>
+<p>Cannot find name ‘console’ 或者没有console就直接没反应</p>
+<ul>
+<li>原文地址: <a target="_blank" rel="noopener external nofollow noreferrer" href="https://blog.csdn.net/weixin_50336155/article/details/120345624">https://blog.csdn.net/weixin_50336155/article/details/120345624</a></li>
+</ul>
+<p><img src="https://files.catbox.moe/uoz66n.png"  alt="" /></p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /></pre></td><td class="code"><pre><span class="line"></span><br /><span class="line">// 1. 删掉原来的包</span><br /><span class="line">npm uninstall ts-node -g</span><br /><span class="line">// 2. 下载指定的包(这个版本试了是可以的)</span><br /><span class="line">npm i -g ts-node@8.5.4</span><br /></pre></td></tr></table></figure>
+<hr />

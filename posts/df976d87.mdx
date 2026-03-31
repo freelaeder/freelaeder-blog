@@ -1,0 +1,57 @@
+---
+title: "triangle"
+date: "2022-05-17T21:31:00+08:00"
+slug: "df976d87"
+tags:
+  - "triangle"
+  - "css面试"
+summary: "面试官：CSS如何画一个三角形？原理是什么？ 在前端开发的时候，我们有时候会需要用到一个三角形的形状，比如地址选择或者播放器里面播放按钮"
+cover: "/legacy/img/picsix/wallsix (3).png"
+---
+
+<h1 id="面试官：CSS如何画一个三角形？原理是什么？">面试官：CSS如何画一个三角形？原理是什么？</h1><p><img src="https://static.vue-js.com/bd310120-a279-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<h2 id="一、前言">一、前言</h2><p>在前端开发的时候，我们有时候会需要用到一个三角形的形状，比如地址选择或者播放器里面播放按钮</p>
+<p> <img src="https://static.vue-js.com/d6d8ff60-a279-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>通常情况下，我们会使用图片或者<code>svg</code>去完成三角形效果图，但如果单纯使用<code>css</code>如何完成一个三角形呢？</p>
+<p>实现过程似乎也并不困难，通过边框就可完成</p>
+<h2 id="二、实现过程">二、实现过程</h2><p>在以前也讲过盒子模型，默认情况下是一个矩形，实现也很简单</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br /><span class="line"><span class="css">    <span class="selector-class">.border</span> &#123;</span></span><br /><span class="line"><span class="css">        <span class="attribute">width</span>: <span class="number">50px</span>;</span></span><br /><span class="line"><span class="css">        <span class="attribute">height</span>: <span class="number">50px</span>;</span></span><br /><span class="line"><span class="css">        <span class="attribute">border</span>: <span class="number">2px</span> solid;</span></span><br /><span class="line"><span class="css">        <span class="attribute">border-color</span>: <span class="number">#96ceb4</span> <span class="number">#ffeead</span> <span class="number">#d9534f</span> <span class="number">#ffad60</span>;</span></span><br /><span class="line"><span class="css">    &#125;</span></span><br /><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br /><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;border&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br /></pre></td></tr></table></figure>
+<p>效果如下图所示：</p>
+<p> <img src="https://static.vue-js.com/e3f244e0-a279-11eb-ab90-d9ae814b240d.png"  alt="" /></p>
+<p>将<code>border</code>设置<code>50px</code>，效果图如下所示：</p>
+<p> <img src="https://static.vue-js.com/ee0b42b0-a279-11eb-ab90-d9ae814b240d.png"  alt="" /></p>
+<p>白色区域则为<code>width</code>、<code>height</code>，这时候只需要你将白色区域部分宽高逐渐变小，最终变为0，则变成如下图所示：</p>
+<p> <img src="https://static.vue-js.com/2afaa030-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>这时候就已经能够看到4个不同颜色的三角形，如果需要下方三角形，只需要将上、左、右边框设置为0就可以得到下方的红色三角形</p>
+<p> <img src="https://static.vue-js.com/2afaa030-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>但这种方式，虽然视觉上是实现了三角形，但实际上，隐藏的部分任然占据部分高度，需要将上方的宽度去掉</p>
+<p>最终实现代码如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.border</span> &#123;</span><br /><span class="line">    <span class="attribute">width</span>: <span class="number">0</span>;</span><br /><span class="line">    <span class="attribute">height</span>: <span class="number">0</span>;</span><br /><span class="line">    <span class="attribute">border-style</span>:solid;</span><br /><span class="line">    <span class="attribute">border-width</span>: <span class="number">0</span> <span class="number">50px</span> <span class="number">50px</span>;</span><br /><span class="line">    <span class="attribute">border-color</span>: transparent transparent <span class="number">#d9534f</span>;</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<p>如果想要实现一个只有边框是空心的三角形，由于这里不能再使用<code>border</code>属性，所以最直接的方法是利用伪类新建一个小一点的三角形定位上去</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /><span class="line">11</span><br /><span class="line">12</span><br /><span class="line">13</span><br /><span class="line">14</span><br /><span class="line">15</span><br /><span class="line">16</span><br /><span class="line">17</span><br /></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.border</span> &#123;</span><br /><span class="line">    <span class="attribute">width</span>: <span class="number">0</span>;</span><br /><span class="line">    <span class="attribute">height</span>: <span class="number">0</span>;</span><br /><span class="line">    <span class="attribute">border-style</span>:solid;</span><br /><span class="line">    <span class="attribute">border-width</span>: <span class="number">0</span> <span class="number">50px</span> <span class="number">50px</span>;</span><br /><span class="line">    <span class="attribute">border-color</span>: transparent transparent <span class="number">#d9534f</span>;</span><br /><span class="line">    <span class="attribute">position</span>: relative;</span><br /><span class="line">&#125;</span><br /><span class="line"><span class="selector-class">.border</span>:after&#123;</span><br /><span class="line">    content: <span class="string">&#x27;&#x27;</span>;</span><br /><span class="line">    <span class="attribute">border-style</span>:solid;</span><br /><span class="line">    <span class="attribute">border-width</span>: <span class="number">0</span> <span class="number">40px</span> <span class="number">40px</span>;</span><br /><span class="line">    <span class="attribute">border-color</span>: transparent transparent <span class="number">#96ceb4</span>;</span><br /><span class="line">    <span class="attribute">position</span>: absolute;</span><br /><span class="line">    <span class="attribute">top</span>: <span class="number">0</span>;</span><br /><span class="line">    <span class="attribute">left</span>: <span class="number">0</span>;</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<p>效果图如下所示：</p>
+<p> <img src="https://static.vue-js.com/59f4d720-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="i" /></p>
+<p>伪类元素定位参照对象的内容区域宽高都为0，则内容区域即可以理解成中心一点，所以伪元素相对中心这点定位</p>
+<p>将元素定位进行微调以及改变颜色，就能够完成下方效果图：</p>
+<p> <img src="https://static.vue-js.com/653a6e10-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>最终代码如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.border</span>:after &#123;</span><br /><span class="line">    content: <span class="string">&#x27;&#x27;</span>;</span><br /><span class="line">    <span class="attribute">border-style</span>: solid;</span><br /><span class="line">    <span class="attribute">border-width</span>: <span class="number">0</span> <span class="number">40px</span> <span class="number">40px</span>;</span><br /><span class="line">    <span class="attribute">border-color</span>: transparent transparent <span class="number">#96ceb4</span>;</span><br /><span class="line">    <span class="attribute">position</span>: absolute;</span><br /><span class="line">    <span class="attribute">top</span>: <span class="number">6px</span>;</span><br /><span class="line">    <span class="attribute">left</span>: -<span class="number">40px</span>;</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<h2 id="三、原理分析">三、原理分析</h2><p>可以看到，边框是实现三角形的部分，边框实际上并不是一个直线，如果我们将四条边设置不同的颜色，将边框逐渐放大，可以得到每条边框都是一个梯形</p>
+<p> <img src="https://static.vue-js.com/78d4bd90-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>当分别取消边框的时候，发现下面几种情况：</p>
+<ul>
+<li>取消一条边的时候，与这条边相邻的两条边的接触部分会变成直的</li>
+<li>当仅有邻边时， 两个边会变成对分的三角</li>
+<li><p>当保留边没有其他接触时，极限情况所有东西都会消失</p>
+<p><img src="https://static.vue-js.com/84586ef0-a27a-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+</li>
+</ul>
+<p>通过上图的变化规则，利用旋转、隐藏，以及设置内容宽高等属性，就能够实现其他类型的三角形</p>
+<p>如设置直角三角形，如上图倒数第三行实现过程，我们就能知道整个实现原理</p>
+<p>实现代码如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /><span class="line">11</span><br /></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.box</span> &#123;</span><br /><span class="line">    <span class="comment">/* 内部大小 */</span></span><br /><span class="line">    <span class="attribute">width</span>: <span class="number">0px</span>;</span><br /><span class="line">    <span class="attribute">height</span>: <span class="number">0px</span>;</span><br /><span class="line">    <span class="comment">/* 边框大小 只设置两条边*/</span></span><br /><span class="line">    <span class="attribute">border-top</span>: <span class="number">#4285f4</span> solid;</span><br /><span class="line">    <span class="attribute">border-right</span>: transparent solid;</span><br /><span class="line">    <span class="attribute">border-width</span>: <span class="number">85px</span>; </span><br /><span class="line">    <span class="comment">/* 其他设置 */</span></span><br /><span class="line">    <span class="attribute">margin</span>: <span class="number">50px</span>;</span><br /><span class="line">&#125;</span><br /></pre></td></tr></table></figure>
+<h2 id="参考文献">参考文献</h2><ul>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://www.cnblogs.com/echolun/p/11888612.html">https://www.cnblogs.com/echolun/p/11888612.html</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://juejin.cn/post/6844903567795421197">https://juejin.cn/post/6844903567795421197</a></li>
+<li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://vue3js.cn/interview">https://vue3js.cn/interview</a></li>
+</ul>

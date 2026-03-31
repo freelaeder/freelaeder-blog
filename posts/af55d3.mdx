@@ -1,0 +1,52 @@
+---
+title: "scope"
+date: "2022-06-16T23:03:00+08:00"
+slug: "af55d3"
+tags:
+  - "js面试"
+  - "scope"
+summary: "面试官：说说你对作用域链的理解 作用域，即变量（变量作用域又称上下文）和函数生效（能被访问）的区域或集合"
+cover: "/legacy/img/picfive/wallfive (26).png"
+---
+
+<h1 id="面试官：说说你对作用域链的理解">面试官：说说你对作用域链的理解</h1><p> <img src="https://static.vue-js.com/16f614a0-718f-11eb-ab90-d9ae814b240d.png"  alt="" /></p>
+<h2 id="一、作用域">一、作用域</h2><p>作用域，即变量（变量作用域又称上下文）和函数生效（能被访问）的区域或集合</p>
+<p>换句话说，作用域决定了代码区块中变量和其他资源的可见性</p>
+<p>举个例子</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">myFunction</span>(<span class="params"></span>) </span>&#123;</span><br /><span class="line">    <span class="keyword">let</span> inVariable = <span class="string">&quot;函数内部变量&quot;</span>;</span><br /><span class="line">&#125;</span><br /><span class="line">myFunction();<span class="comment">//要先执行这个函数，否则根本不知道里面是啥</span></span><br /><span class="line"><span class="built_in">console</span>.log(inVariable); <span class="comment">// Uncaught ReferenceError: inVariable is not defined</span></span><br /></pre></td></tr></table></figure>
+<p>上述例子中，函数<code>myFunction</code>内部创建一个<code>inVariable</code>变量，当我们在全局访问这个变量的时候，系统会报错</p>
+<p>这就说明我们在全局是无法获取到（闭包除外）函数内部的变量</p>
+<p>我们一般将作用域分成：</p>
+<ul>
+<li>全局作用域</li>
+<li><p>函数作用域</p>
+</li>
+<li><p>块级作用域</p>
+</li>
+</ul>
+<h3 id="全局作用域">全局作用域</h3><p>任何不在函数中或是大括号中声明的变量，都是在全局作用域下，全局作用域下声明的变量可以在程序的任意位置访问</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /></pre></td><td class="code"><pre><span class="line"><span class="comment">// 全局变量</span></span><br /><span class="line"><span class="keyword">var</span> greeting = <span class="string">&#x27;Hello World!&#x27;</span>;</span><br /><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params"></span>) </span>&#123;</span><br /><span class="line">  <span class="built_in">console</span>.log(greeting);</span><br /><span class="line">&#125;</span><br /><span class="line"><span class="comment">// 打印 &#x27;Hello World!&#x27;</span></span><br /><span class="line">greet();</span><br /></pre></td></tr></table></figure>
+<h3 id="函数作用域">函数作用域</h3><p>函数作用域也叫局部作用域，如果一个变量是在函数内部声明的它就在一个函数作用域下面。这些变量只能在函数内部访问，不能在函数以外去访问</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params"></span>) </span>&#123;</span><br /><span class="line">  <span class="keyword">var</span> greeting = <span class="string">&#x27;Hello World!&#x27;</span>;</span><br /><span class="line">  <span class="built_in">console</span>.log(greeting);</span><br /><span class="line">&#125;</span><br /><span class="line"><span class="comment">// 打印 &#x27;Hello World!&#x27;</span></span><br /><span class="line">greet();</span><br /><span class="line"><span class="comment">// 报错： Uncaught ReferenceError: greeting is not defined</span></span><br /><span class="line"><span class="built_in">console</span>.log(greeting);</span><br /></pre></td></tr></table></figure>
+<p>可见上述代码中在函数内部声明的变量或函数，在函数外部是无法访问的，这说明在函数内部定义的变量或者方法只是函数作用域</p>
+<h3 id="块级作用域">块级作用域</h3><p>ES6引入了<code>let</code>和<code>const</code>关键字,和<code>var</code>关键字不同，在大括号中使用<code>let</code>和<code>const</code>声明的变量存在于块级作用域中。在大括号之外不能访问这些变量</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /></pre></td><td class="code"><pre><span class="line">&#123;</span><br /><span class="line">  <span class="comment">// 块级作用域中的变量</span></span><br /><span class="line">  <span class="keyword">let</span> greeting = <span class="string">&#x27;Hello World!&#x27;</span>;</span><br /><span class="line">  <span class="keyword">var</span> lang = <span class="string">&#x27;English&#x27;</span>;</span><br /><span class="line">  <span class="built_in">console</span>.log(greeting); <span class="comment">// Prints &#x27;Hello World!&#x27;</span></span><br /><span class="line">&#125;</span><br /><span class="line"><span class="comment">// 变量 &#x27;English&#x27;</span></span><br /><span class="line"><span class="built_in">console</span>.log(lang);</span><br /><span class="line"><span class="comment">// 报错：Uncaught ReferenceError: greeting is not defined</span></span><br /><span class="line"><span class="built_in">console</span>.log(greeting);</span><br /></pre></td></tr></table></figure>
+<h2 id="二、词法作用域">二、词法作用域</h2><p>词法作用域，又叫静态作用域，变量被创建时就确定好了，而非执行阶段确定的。也就是说我们写好代码时它的作用域就确定了，<code>JavaScript</code> 遵循的就是词法作用域</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">2</span>;</span><br /><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span>&#123;</span><br /><span class="line">    <span class="built_in">console</span>.log(a)</span><br /><span class="line">&#125;</span><br /><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span>&#123;</span><br /><span class="line">    <span class="keyword">var</span> a = <span class="number">3</span>;</span><br /><span class="line">    foo();</span><br /><span class="line">&#125;</span><br /><span class="line">n()</span><br /></pre></td></tr></table></figure>
+<p>上述代码改变成一张图</p>
+<p> <img src="https://static.vue-js.com/29fab3d0-718f-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>由于<code>JavaScript</code>遵循词法作用域，相同层级的 <code>foo</code> 和 <code>bar</code> 就没有办法访问到彼此块作用域中的变量，所以输出2</p>
+<h2 id="三、作用域链">三、作用域链</h2><p>当在<code>Javascript</code>中使用一个变量的时候，首先<code>Javascript</code>引擎会尝试在当前作用域下去寻找该变量，如果没找到，再到它的上层作用域寻找，以此类推直到找到该变量或是已经到了全局作用域</p>
+<p>如果在全局作用域里仍然找不到该变量，它就会在全局范围内隐式声明该变量(非严格模式下)或是直接报错</p>
+<p>这里拿《你不知道的Javascript(上)》中的一张图解释：</p>
+<p>把作用域比喻成一个建筑，这份建筑代表程序中的嵌套作用域链，第一层代表当前的执行作用域，顶层代表全局作用域</p>
+<p> <img src="https://static.vue-js.com/33f9c100-718f-11eb-85f6-6fac77c0c9b3.png"  alt="" /></p>
+<p>变量的引用会顺着当前楼层进行查找，如果找不到，则会往上一层找，一旦到达顶层，查找的过程都会停止</p>
+<p>下面代码演示下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /><span class="line">3</span><br /><span class="line">4</span><br /><span class="line">5</span><br /><span class="line">6</span><br /><span class="line">7</span><br /><span class="line">8</span><br /><span class="line">9</span><br /><span class="line">10</span><br /><span class="line">11</span><br /><span class="line">12</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sex = <span class="string">&#x27;男&#x27;</span>;</span><br /><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">person</span>(<span class="params"></span>) </span>&#123;</span><br /><span class="line">    <span class="keyword">var</span> name = <span class="string">&#x27;张三&#x27;</span>;</span><br /><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">student</span>(<span class="params"></span>) </span>&#123;</span><br /><span class="line">        <span class="keyword">var</span> age = <span class="number">18</span>;</span><br /><span class="line">        <span class="built_in">console</span>.log(name); <span class="comment">// 张三</span></span><br /><span class="line">        <span class="built_in">console</span>.log(sex); <span class="comment">// 男 </span></span><br /><span class="line">    &#125;</span><br /><span class="line">    student();</span><br /><span class="line">    <span class="built_in">console</span>.log(age); <span class="comment">// Uncaught ReferenceError: age is not defined</span></span><br /><span class="line">&#125;</span><br /><span class="line">person();</span><br /></pre></td></tr></table></figure>
+<p>上述代码主要主要做了以下工作：</p>
+<ul>
+<li><code>student</code>函数内部属于最内层作用域，找不到<code>name</code>，向上一层作用域<code>person</code>函数内部找，找到了输出“张三”</li>
+<li><code>student</code>内部输出<code>sex</code>时找不到，向上一层作用域<code>person</code>函数找，还找不到继续向上一层找，即全局作用域，找到了输出“男”</li>
+<li>在<code>person</code>函数内部输出<code>age</code>时找不到，向上一层作用域找，即全局作用域，还是找不到则报错</li>
+</ul>

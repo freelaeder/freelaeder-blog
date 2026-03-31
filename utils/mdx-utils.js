@@ -1,21 +1,62 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { serialize } from 'next-mdx-remote/serialize';
-import rehypePrism from '@mapbox/rehype-prism';
-import remarkGfm from 'remark-gfm';
-import rehypeUnwrapImages from 'rehype-unwrap-images';
 
 // POSTS_PATH is useful when you want to get the path to a specific file
 export const POSTS_PATH = path.join(process.cwd(), 'posts');
 
-// getPostFilePaths is the list of all mdx files inside the POSTS_PATH directory
+const normalizeTagList = (tags = []) => {
+  if (Array.isArray(tags)) {
+    return tags.map((tag) => `${tag}`.trim()).filter(Boolean);
+  }
+
+  if (typeof tags === 'string') {
+    return tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const normalizeDate = (dateValue) => {
+  if (!dateValue) return '';
+  if (typeof dateValue !== 'string') return `${dateValue}`;
+  return dateValue.replace('T', ' ').replace(/\+\d\d:\d\d$/, '');
+};
+
+const getSlugFromFilePath = (filePath) => filePath.replace(/\.mdx?$/, '');
+
+const normalizePostData = (data, filePath) => {
+  const slug = data.slug || data.abbrlink || getSlugFromFilePath(filePath);
+  const summary = data.summary || data.description || '';
+
+  return {
+    ...data,
+    slug,
+    date: normalizeDate(data.date),
+    updated: normalizeDate(data.updated),
+    tags: normalizeTagList(data.tags),
+    summary,
+    description: summary,
+    cover: data.cover || '',
+  };
+};
+
+const normalizePost = (post) => ({
+  ...post,
+  slug: normalizePostData(post.data, post.filePath).slug,
+  data: normalizePostData(post.data, post.filePath),
+});
+
 export const getPostFilePaths = () => {
   return (
     fs
       .readdirSync(POSTS_PATH)
       // Only include md(x) files
-      .filter((path) => /\.mdx?$/.test(path))
+      .filter((filePath) => /\.mdx?$/.test(filePath))
+      .sort()
   );
 };
 
@@ -32,11 +73,11 @@ export const getPosts = () => {
     const source = fs.readFileSync(path.join(POSTS_PATH, filePath));
     const { content, data } = matter(source);
 
-    return {
+    return normalizePost({
       content,
       data,
       filePath,
-    };
+    });
   });
 
   posts = sortPostsByDate(posts);
@@ -44,56 +85,51 @@ export const getPosts = () => {
   return posts;
 };
 
+export const getPostSummaries = () =>
+  getPosts().map(({ content, ...post }) => post);
+
 export const getPostBySlug = async (slug) => {
-  const postFilePath = path.join(POSTS_PATH, `${slug}.mdx`);
+  const post = getPosts().find((entry) => entry.slug === slug);
+
+  if (!post) {
+    throw new Error(`Post not found for slug: ${slug}`);
+  }
+
+  const postFilePath = path.join(POSTS_PATH, post.filePath);
   const source = fs.readFileSync(postFilePath);
 
   const { content, data } = matter(source);
+  const normalizedData = normalizePostData(data, post.filePath);
 
-  const mdxSource = await serialize(content, {
-    // Optionally pass remark/rehype plugins
-    mdxOptions: {
-      remarkPlugins: [remarkGfm],
-      rehypePlugins: [rehypePrism, rehypeUnwrapImages],
-    },
-    scope: data,
-  });
-
-  return { mdxSource, data, postFilePath };
+  return { html: content, data: normalizedData, postFilePath };
 };
 
 export const getNextPostBySlug = (slug) => {
   const posts = getPosts();
-  const currentFileName = `${slug}.mdx`;
-  const currentPost = posts.find((post) => post.filePath === currentFileName);
+  const currentPost = posts.find((post) => post.slug === slug);
   const currentPostIndex = posts.indexOf(currentPost);
 
   const post = posts[currentPostIndex - 1];
   // no prev post found
   if (!post) return null;
 
-  const nextPostSlug = post?.filePath.replace(/\.mdx?$/, '');
-
   return {
     title: post.data.title,
-    slug: nextPostSlug,
+    slug: post.slug,
   };
 };
 
 export const getPreviousPostBySlug = (slug) => {
   const posts = getPosts();
-  const currentFileName = `${slug}.mdx`;
-  const currentPost = posts.find((post) => post.filePath === currentFileName);
+  const currentPost = posts.find((post) => post.slug === slug);
   const currentPostIndex = posts.indexOf(currentPost);
 
   const post = posts[currentPostIndex + 1];
   // no prev post found
   if (!post) return null;
 
-  const previousPostSlug = post?.filePath.replace(/\.mdx?$/, '');
-
   return {
     title: post.data.title,
-    slug: previousPostSlug,
+    slug: post.slug,
   };
 };
