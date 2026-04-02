@@ -1,0 +1,102 @@
+---
+title: "Claude Code 手册拆读 03：三种权限模式"
+date: "2025-12-28T03:00:00+08:00"
+slug: "claude-code-best-practices-03-permission-modes"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "认识 Claude Code"
+summary: "讲清 Normal、Auto-Accept、Plan 三种模式各自适用的风险边界和使用场景。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Claude Code 提供三种权限模式，控制它在多大程度上可以自主行动：Normal Mode（每步确认）、 Auto-Accept Mode（自动接受文件编辑）、Plan Mode（只读分析，不执行任何修改）。选择正确的模 式是高效、安全使用 Claude Code 的关键。</p>
+
+<p>三种模式快速切换 在交互式会话中，按 Shift+Tab 可以在三种模式之间循环切换，当前模式会显示在界面顶部：</p>
+
+<p>默认 | ⇥</p>
+
+<p>⏵⏵ accept edits on ⇥ ⏸ plan mode on ⇥ 回到 Normal 也可以在启动时通过命令行参数指定模式：</p>
+
+<p># 以 Plan Mode 启动 # 非交互式分析（Plan Mode 变体） claude --permission-mode plan -p &quot;分析认证系统并提出重构建议&quot; Normal Mode：默认的安全模式 这是 Claude Code 的默认工作模式。在 Normal Mode 下，Claude Code 每次想要执行写操作（编辑文件、运 行命令）时，都会先向你展示要做什么，然后等待你的批准（按 Enter 确认，或按 Esc 拒绝）。</p>
+
+<p>权限边界：</p>
+
+<p>文件读取：自动执行，无需批准 文件编辑（Edit / Write）：需要你确认 Shell 命令（Bash）：需要你确认，每次都显示完整命令 什么时候用 Normal Mode？当你对代码库还不熟悉、任务涉及敏感文件、或者操作的后果不可逆时，Normal Mode 是最安全的选择。它把最终决定权留在你手中。</p>
+
+<p>Normal Mode 下你可以通过白名单减少频繁确认的摩擦。对于你已经信任的命令（如运行测试、查看 git 状 态），可以在项目配置中预设白名单：</p>
+
+<p>{ ] } } Auto-Accept Mode：提速的编辑模式 Auto-Accept Mode 在界面顶部显示 ⏵⏵ accept edits on。在这个模式下，Claude Code 会自动接受所有文 件编辑操作（Edit / Write），无需你逐一确认。但 Shell 命令仍然需要你的批准。</p>
+
+<p>权限边界：</p>
+
+<p>文件读取：自动执行 文件编辑（Edit / Write）：自动接受 Shell 命令（Bash）：仍需你确认 不推荐 推荐 适合使用 Auto-Accept 的场景 不适合使用 Auto-Accept 的场景 • 你已经在 Plan Mode 下审阅并确认了实现计划 • 修改生产环境配置文件（数据库连接、API 密钥） • 任务是低风险的批量操作（格式化、重命名、模板生 • 对你不熟悉的代码库进行大范围重构 • 任何编辑错误会导致数据丢失的操作 成） • 你对代码库非常熟悉，能快速判断每次编辑是否正确 • 团队协作中需要每步留有审查记录的场景 • 正在做原型开发，速度优先于严谨性 注意 Auto-Accept Mode 中&quot;自动接受&quot;的范围仅限于文件编辑，不包括 Shell 命令。真正危险的操作（如 rm - rf 、数据库写入、云资源修改）仍然需要你手动批准。</p>
+
+<p>Plan Mode：深思熟虑的分析模式 Plan Mode 在界面顶部显示 ⏸ plan mode on。这是最保守的模式——Claude Code 只能使用只读工具 （Read、Grep、Glob、WebSearch），分析完代码库后生成一份详细的实现计划，不执行任何写操作。</p>
+
+<p>权限边界：</p>
+
+<p>只读工具（Read / Grep / Glob）：可以使用 文件编辑（Edit / Write）：完全禁止 Shell 命令（Bash）：完全禁止 Plan Mode 特别适合以下四类场景：</p>
+
+<p>场景 | 为什么用 Plan Mode | 典型提示词</p>
+
+<p>涉及 7 个以上文件时，先规划后执行质量更高，避 &quot;分析添加 OAuth 需要修改哪些文件，生成详 多文件大型 细计划&quot; 任务 免遗漏 &quot;读取 src/ 目录，告诉我这个项目的架构和核 在不修改任何内容的前提下，快速建立对项目的全 探索陌生代 心模块&quot; 码库 局理解 需要与 Claude Code 来回讨论实现方向，确认方 &quot;我有两个方案，帮我分析各自的优缺点和影 迭代讨论方 响范围&quot; 案 案后再执行</p>
+
+<p>架构级重构 | 大型架构变更风险极高，先全面分析影响再动手 | &quot;分析将 REST API 迁移到 GraphQL 需要的</p>
+
+<p>改动范围&quot; Claude Code 创始人 Boris Cherny 推荐的高效工作流是：</p>
+
+<p>1 | 在 Plan Mode 中探索与规划</p>
+
+<p>启动 Plan Mode，描述任务目标。Claude Code 会读取相关代码，生成一份包含&quot;需要修改哪些文 件&quot;、&quot;每个文件改什么&quot;、&quot;执行顺序&quot;的详细计划。</p>
+
+<p>2 | 迭代完善计划</p>
+
+<p>在 Plan Mode 中与 Claude Code 来回讨论，调整计划细节。按 Ctrl+G 可以在文本编辑器中直接编辑计 划，在计划中添加你自己的要求或限制。</p>
+
+<p>3 | 切换到 Auto-Accept Mode 执行</p>
+
+<p>确认计划可行后，按 Shift+Tab 切换到 Auto-Accept Mode，让 Claude Code 按计划执行。由于计划已 经充分审阅，自动接受文件编辑的风险很低。</p>
+
+<p>4 | 验证结果</p>
+
+<p>执行完成后，运行测试套件，检查 git diff，确认实现符合计划预期。如有偏差，可切换回 Normal Mode 进行针对性修正。</p>
+
+<p>三种模式选择策略对比 决策维度 Normal Mode Auto-Accept Mode Plan Mode</p>
+
+<p>执行速度 | 慢（每步确认） | 快（文件编辑自动接受） | 不执行（仅分析）</p>
+
+<p>安全级别 | 高 | 中 | 最高（只读）</p>
+
+<p>适合任务规模 | 小至中型任务 | 已规划的中大型任务 | 任意规模的规划阶段</p>
+
+<p>低（不熟悉也安全） | 中（需要能快速判断编辑是否</p>
+
+<p>对代码库熟悉度 无（探索工具） 正确） 要求</p>
+
+<p>计划已确认后的执行阶段 | 任务开始前的分析阶段</p>
+
+<p>推荐使用时机 | 日常开发、敏感操</p>
+
+<p>作</p>
+
+<p>快捷键 | 默认 / Shift+Tab 切</p>
+
+<p>Shift+Tab Shift+Tab / --permission-mode 回 核心建议 对于复杂任务，推荐的最佳实践是：Plan Mode（探索）→ Plan Mode（迭代计划）→ Auto-Accept Mode （执行）→ Normal Mode（验证修正）。这个四阶段流程在效率和安全性之间取得了最佳平衡。</p>
+
+<p>将模式设为默认 如果你发现自己每次启动都要切换到同一个模式，可以在配置文件中设置默认模式：</p>
+
+<p>// .claude/settings.json（项目级，仅影响当前项目） { } }</p>
+
+<pre><code>// ~/.claude/settings.json（用户级，影响所有项目）</code></pre>
+
+<p>{ } } 推荐配置：对于新接触的代码库，建议将项目级 defaultMode 设置为 &quot;plan&quot;，强迫自己先分析后执行。对 于熟悉的长期项目，用户级默认保持 &quot;normal&quot; 即可，按需切换。</p>

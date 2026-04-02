@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { marked } from 'marked';
 
 // POSTS_PATH is useful when you want to get the path to a specific file
 export const POSTS_PATH = path.join(process.cwd(), 'posts');
@@ -100,8 +101,12 @@ export const getPostBySlug = async (slug) => {
 
   const { content, data } = matter(source);
   const normalizedData = normalizePostData(data, post.filePath);
+  const html = await marked.parse(content, {
+    gfm: true,
+    breaks: false,
+  });
 
-  return { html: content, data: normalizedData, postFilePath };
+  return { html, data: normalizedData, postFilePath };
 };
 
 export const getNextPostBySlug = (slug) => {

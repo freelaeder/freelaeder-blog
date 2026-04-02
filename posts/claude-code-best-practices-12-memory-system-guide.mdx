@@ -1,0 +1,88 @@
+---
+title: "Claude Code 手册拆读 12：记忆系统深度指南"
+date: "2026-01-23T23:18:00+08:00"
+slug: "claude-code-best-practices-12-memory-system-guide"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "项目配置体系"
+summary: "理解 CLAUDE.md、Auto Memory 与项目记忆的分工，避免会话一换就失忆。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Claude Code 提供了四类记忆机制，分工明确、互为补充：CLAUDE.md 承载固定规范，Auto Memory 积累经验发现，Skills 提供按需专项知识，Subagent Memory 隔离代理学习成果。理解四类 机制的边界，并掌握 MEMORY.md 的索引维护策略，是构建持久上下文、让 Claude 越用越聪明的核 心所在。</p>
+
+<p>四类记忆机制对比</p>
+
+<p>类型 | 写入者 | 加载时机 | 作用范围 | 最适合内容</p>
+
+<p>CLAUDE.md 开发者手动每次会话全量加载项目/用户/企业级编码规范、命令、架构约 定、禁止行为 Auto Memory Claude 自动 MEMORY.md 前</p>
+
+<p>按 git 仓库隔离 | 构建命令发现、调试洞察、</p>
+
+<p>200 行 API 偏好 Skills 开发者手动被调用时按需加载个人或项目特定工作流、领域知识、输 出模板 Subagent 启动时 user/project/local 代理专属学习成果、跨项目 代理知识 动 核心原则：Claude 将记忆作为上下文处理，而非强制执行的配置。指令越具体、越简洁，Claude 遵循得越一 致。记忆不会自动产生约束力，约束力来自写法的精确性。</p>
+
+<p>Auto Memory：存储位置与工作原理 Auto Memory 需要 Claude Code v2.1.59 或更高版本（通过 claude --version 检查）。每个项目的记忆目录 位于：</p>
+
+<pre><code>├── MEMORY.md # 简洁索引，每次会话加载前 200 行</code></pre>
+
+<pre><code>├── debugging.md # 调试模式的详细笔记</code></pre>
+
+<pre><code>├── api-conventions.md # API 设计决策</code></pre>
+
+<pre><code>├── build-commands.md # 构建命令和环境配置</code></pre>
+
+<pre><code>└── ... # Claude 按需创建的主题文件</code></pre>
+
+<p>&lt;project&gt; 路径从 git 仓库根目录派生，因此同一仓库的所有 worktrees 和子目录共享同一个 Auto Memory 目录。在 git 仓库外部，使用项目根目录路径。</p>
+
+<p>关键加载规则：</p>
+
+<p>MEMORY.md 的前 200 行在每次对话开始时自动加载，超出部分不加载 主题文件（如 debugging.md ）不在启动时加载，Claude 在需要时按需读取 CLAUDE.md 无论长短都完整加载；MEMORY.md 只加载前 200 行 Claude 在 UI 中显示&quot;Writing memory&quot;或&quot;Recalled memory&quot;时，正在主动操作记忆文件 Auto Memory 默认开启，可通过以下方式管理：</p>
+
+<p># 会话内切换：运行 /memory 命令，使用自动记忆开关 # 通过配置禁用（项目级） { } # 通过环境变量禁用 # 自定义存储位置（仅用户/本地 settings.json，不可在项目级配置） { } MEMORY.md 索引维护策略 MEMORY.md 是记忆目录的入口和索引，类比图书馆目录卡——告诉 Claude 去哪里找特定主题的详细信息。</p>
+
+<p>200 行限制迫使它保持精简：</p>
+
+<p>放在 MEMORY.md 的内容：高频摘要信息、关键命令、常用路径引用、用户偏好发现 移入主题文件的内容：详细技术说明、长篇分析、完整的错误排查记录 以下是一个典型项目的 MEMORY.md 示例，展示了 Claude 自动积累和维护的格式：</p>
+
+<p># 项目记忆 - MyApp ## 核心构建命令 - 开发服务器：`pnpm dev`（端口 3000） - 生产构建：`pnpm build &amp;&amp; pnpm start` - 数据库迁移：`pnpm db:migrate`（需要 Docker PostgreSQL 运行中） - 快速测试：`pnpm test src/lib/auth.test.ts`（避免运行整个套件） ## 关键文件位置 - 认证配置：`src/lib/auth.ts`（NextAuth.js 配置） - 数据库客户端：`src/lib/db.ts`（单例 Prisma 实例） - API 路由入口：`src/app/api/` ## 已解决的问题记录 - **Redis 测试问题（2025-12）**：API 测试需要本地 Redis。</p>
+
+<p>- **Stripe Webhook 本地调试**：</p>
+
+<p>## 用户偏好发现 - 修改一系列代码后再统一类型检查（不是边改边查） - 测试时优先运行单个文件，而非完整套件 - 提交消息使用英文 Conventional Commits 格式 ## 代码模式发现 - 错误处理统一使用 `src/lib/errors.ts` 中的 `AppError` 类 - 文件上传：通过 S3 预签名 URL，前端直传，后端不中转 ## 主题文件索引 - debugging.md — 复杂 bug 的排查过程记录 - api-patterns.md — API 设计规范和常用响应模式 - performance-insights.md — 性能优化记录 - environment-setup.md — 开发环境配置完整步骤 跨会话上下文保持 CLAUDE.md、Auto Memory 和 Skills 三者分工如下：</p>
+
+<p>固定规范指令 经验积累发现 按需专项知识 → CLAUDE.md + → Auto Memory + 会话管理常用命令：</p>
+
+<p>claude --continue # 恢复最近的会话 claude --resume # 从会话列表中选择恢复 /rename # 给会话起描述性名称（如 &quot;oauth-migration&quot;） /clear # 重置上下文窗口（切换不相关任务时）</p>
+
+<pre><code>/compact [指令] # 压缩历史记录（如：/compact 专注于 API 修改）</code></pre>
+
+<p>/memory # 浏览和管理记忆文件 三种固化跨会话知识的实用技巧：</p>
+
+<p>1 | 手动写入 CLAUDE.md</p>
+
+<p>当会话中确定了某项决策时，明确请 Claude 将其写入 CLAUDE.md：&quot;我们已决定使用 pnpm，请把这条 加到 CLAUDE.md。&quot; 下次会话自动生效。</p>
+
+<p>2 | 触发 Auto Memory 记录</p>
+
+<p>直接告知 Claude 需要记住的信息：&quot;记住我们的 API 测试需要本地 Redis 实例。&quot; Claude 会自动将此信 息保存到 auto memory，无需手动操作。</p>
+
+<p>3 | 使用 SPEC.md 规格文档</p>
+
+<p>对于复杂任务，先在一次会话中生成 SPEC.md 规格文档，再开启新会话引用该文档实现功能。这种模式 可以绕开上下文窗口限制，适合跨多个会话的大型功能开发。</p>
+
+<p>核心建议 /compact 完全保留 CLAUDE.md（从磁盘重新读取并注入）。如果压缩后某条指令消失，说明它只在对话中口 头给出，从未写入文件。遇到这种情况，应立即将该指令补充到 CLAUDE.md。</p>
+
+<p>Subagent 持久化记忆 Subagent 可以拥有独立的持久化记忆，通过 SKILL.md 的 memory 字段配置作用范围：</p>
+
+<p>Scope 路径适用场景 user ~/.claude/agent-memory/&lt;name&gt;/ 代理知识适用于所有项目 project .claude/agent-memory/&lt;name&gt;/ 项目特定，可提交 git（推荐默认） local .claude/agent-memory-local/&lt;name&gt;/ 项目特定，不提交 git --- description: 代码质量和最佳实践审查专家 memory: project # 项目级共享记忆（推荐） --- 你是一位代码审查专家。在审查代码时，将发现的模式、 约定和反复出现的问题更新到你的记忆中。</p>
