@@ -1,0 +1,106 @@
+---
+title: "Claude Code 手册拆读 04：六大工具精通"
+date: "2025-12-31T13:28:00+08:00"
+slug: "a089ee1f"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "六大工具精通"
+summary: "把 Read、Write、Edit、Bash、Glob、Grep 六个核心工具放进正确的决策框架里。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Claude Code 的核心能力由六个内置工具构成：Read、Write、Edit、Bash、Glob、Grep。每个工具 都有其最佳适用场景和使用边界。真正的高手不是记住所有参数，而是在任何情境下都能本能地选对 工具——对文件做外科手术式的 Edit，而非整体 Write；先 Glob 缩小范围，再 Read 深度阅读；让 Bash 运行测试，让结果告诉你是否成功。掌握这六个工具的使用哲学，是从&quot;会用&quot;到&quot;用好&quot;Claude Code 的核心跃迁。</p>
+
+<p>工具概览与选择原则 六大工具可以用一张决策表来概括：</p>
+
+<p>工具 | 本质 | 何时用 | 优先于</p>
+
+<p>Read 读取文件内容（附行号） 知道路径，需要看具体内容 cat / head / tail Write 创建或完全覆盖文件全新文件，或需要整体重写 echo &gt;&gt; / tee Edit 精确字符串替换修改现有文件的局部内容 Write（局部修改时） Bash 执行 Shell 命令运行测试、构建、Git 操作 — Glob 文件名模式匹配查找文件位置，不知道在哪 find / ls Grep 正则搜索文件内容查找代码位置，搜索引用 grep / rg 核心原则：Glob 和 Grep 是轻量级&quot;导航&quot;工具，成本极低；Read 是中等成本的&quot;深度阅读&quot;工具；</p>
+
+<p>Edit/Write/Bash 是&quot;执行&quot;工具，有真实副作用。导航先行，执行后置，是所有工具组合的底层逻辑。</p>
+
+<p>Read 工具：精准阅读，而非盲目浏览 Read 工具以带行号的格式返回文件内容，这是 Edit 工具能精确替换的基础——Edit 依赖行号来定位和构造 最佳使用场景：</p>
+
+<p>修改文件前，先读当前内容（Edit 的前置要求） 任务开始时，了解关键模块的现有实现 分析测试输出、日志文件、配置文件 读取 PDF、图片（PNG/JPG）、Jupyter Notebook 大文件分段读取：</p>
+
+<p># 读取超大文件时，用 offset 和 limit 参数分段 # 先读文件开头了解结构 # 再读关键函数段落 不推荐 推荐 然后基于读取的内容进行 Edit 缺点：输出无行号，无法直接支持 Edit，走绕路 优点：权限系统更优化，行号信息支持精确 Edit，原生 支持 PDF/图片 核心建议 Edit 工具有一条硬性规则：必须先 Read，再 Edit。Claude 自己会遵守这个规则，因为 Read 返回的行号信息 是 Edit 构造精确 old_string 的依据。如果你让 Claude 直接 Edit 一个没读过的文件，它会主动先去 Read。</p>
+
+<p>Write 工具：从零创建，全量重写 Write 工具的行为是&quot;完全覆盖&quot;：如果文件存在，Write 会丢弃原内容，用新内容替换。这使它成为创建新文件 的首选，但对现有文件的局部修改，应始终优先考虑 Edit。</p>
+
+<p>适合 Write 的场景：</p>
+
+<p>创建全新的模块文件（新组件、新测试文件、新配置） 生成项目脚手架（初始化 CLAUDE.md、package.json 等） 文件内容需要超过 80% 变动的完整重写 从模板生成标准化文件 不适合 Write 的场景：</p>
+
+<p>只需修改函数内部的 3 行逻辑 → 用 Edit 添加一个新方法到现有类 → 用 Edit 更新配置文件中的某个字段 → 用 Edit 注意 Write 是破坏性操作。它不做合并，不保留原文件中 Claude 没看到的部分。对于多人协作的代码库，频繁使用 Write 会导致意外的内容丢失。遇到疑问，选 Edit。</p>
+
+<p>Edit 工具：最重要的工具，精确外科手术 Edit 是六大工具中最常用、最关键的一个。它通过精确的字符串替换来修改文件：你提供 old_string （要替 换的文本）和 new_string （替换后的文本），Edit 找到并执行替换。</p>
+
+<p>Edit 工具的四大优势：</p>
+
+<p>1 | 精确性</p>
+
+<p>只改你指定的地方，文件其他部分完全不受影响。即使是 1000 行的文件，你只需改动第 47 行的一个变 量名。</p>
+
+<p>2 | 可审查性</p>
+
+<p>Edit 操作以清晰的 diff 格式展示（红色删除行，绿色新增行），方便 review，也方便你判断是否接受。</p>
+
+<p>3 | 安全性</p>
+
+<p>如果 old_string 在文件中不存在，Edit 会报错，而不是静默失败。这防止了&quot;以为改了其实没改&quot;的隐 患。</p>
+
+<p>4 | 效率</p>
+
+<p>局部变更无需传输整个文件内容，token 消耗更少，速度更快。</p>
+
+<p>Edit 的关键约束：</p>
+
+<p>old_string 必须在文件中唯一存在（不能匹配到多处） 如果目标字符串有多处匹配，需要提供更多上下文（前后几行）让它变唯一 replace_all: true 参数可以批量替换所有匹配（用于重命名变量） # 批量重命名变量示例 # 将文件中所有 userID 改为 userId Bash 工具：执行与验证的桥梁 Bash 工具让 Claude 拥有真正的 Shell 环境访问权。它不仅仅是&quot;运行命令&quot;，更是连接代码修改与现实验证的 核心桥梁。</p>
+
+<p>Bash 的核心使用场景：</p>
+
+<p>场景 | 示例命令</p>
+
+<p>运行测试 pytest tests/auth/ / npm test / go test ./... 构建项目 npm run build / cargo build / make Git 操作 git status / git commit -m &quot;...&quot; / git diff 安装依赖 pip install -r requirements.txt / npm install 数据库迁移 python manage.py migrate / prisma migrate dev 云服务 CLI gh pr create / aws s3 ls / kubectl get pods Lint 检查 eslint src/ / ruff check . / golangci-lint run 权限白名单配置：频繁使用的安全命令，可以在 .claude/settings.json 中预授权，避免每次都需要手动确 认：</p>
+
+<p>{ ] } } 注意 Bash 工具的工作目录在每次调用间会重置回项目根目录。始终使用绝对路径，不要依赖 cd 的状态持久化。</p>
+
+<p>例如，不要 cd src &amp;&amp; ls，而是直接 ls /path/to/project/src。</p>
+
+<p>超时控制：Bash 默认超时 2 分钟，最长可设为 10 分钟。对于长时间运行的构建任务，需要显式设置 timeout 参数。</p>
+
+<p>管道与输出处理：Bash 可以捕获 stdout 和 stderr，并传递给 Claude 分析：</p>
+
+<p># 将测试输出通过管道传给 Claude 分析 # 然后让 Claude 读 outfile，找出失败根因 # 或在非交互模式直接分析 cat build-error.txt | claude -p &quot;简洁解释这个构建错误的根本原因&quot; Glob 工具：文件导航的第一步 Glob 工具基于文件名模式匹配，返回符合条件的所有文件路径，结果按修改时间倒序排列（最近修改的文件排 在前面）。它是探索陌生代码库的第一步。</p>
+
+<p>常用 Glob 模式速查：</p>
+
+<p>模式 | 匹配内容 | 典型用途</p>
+
+<p>**/*.ts 任意目录下的所有 TypeScript 文件找类型定义、接口 **/*.test.ts 所有测试文件了解测试覆盖情况 src/**/* src 目录下的所有文件探索模块结构 **/package.json 所有 package.json 找子包、monorepo 结构 *.md 项目根目录的 Markdown 文件找文档、README **/*.{js,jsx} 所有 JS 和 JSX 文件混合扩展名搜索 src/api/**/*.ts API 目录下的 TypeScript 定位路由/处理器 核心建议 Glob 的搜索成本极低（几乎不消耗 token），结果按修改时间排序这个特性非常实用：在调试刚刚出问题的代 码时，最近修改的文件往往就是问题所在。始终用 Glob 而非 find 或 ls ——Glob 的权限处理更安全，输出 更结构化。</p>
+
+<p>Grep 工具：内容搜索的利器 Grep 工具基于 ripgrep 构建，支持完整的正则表达式语法，是在代码库中定位函数定义、追踪引用、搜索 API 端点的核心工具。它比 Glob 更强大，代价是需要扫描文件内容（成本略高）。</p>
+
+<p>三种输出模式对比：</p>
+
+<p>模式 | 返回内容 | 适用场景</p>
+
+<p>files_with_matches （默认） | 包含匹配的文件路径列表 | 先缩小范围，再 Read</p>
+
+<p>content 匹配行内容 + 行号直接看代码片段 count 每个文件的匹配次数评估影响范围 实用参数组合：</p>
+
+<p># 查找所有使用 UserService 的文件 # 查看函数定义及周围 3 行上下文 # 只搜索 Python 文件 # 大小写不敏感搜索 # 评估重命名的影响范围（多少文件用了这个函数） 核心建议 Grep 的最佳使用姿势：先用 files_with_matches 模式找到相关文件列表（3-5个），再对这些文件逐一 Read 深度阅读。这比直接读所有可能相关的文件节省大量 token。</p>
+
+<p>Grep 常见使用场景：</p>
+
+<p>查找函数/类定义：pattern=&quot;class UserService&quot; 查找配置项：pattern=&quot;DATABASE_URL|REDIS_URL&quot;</p>

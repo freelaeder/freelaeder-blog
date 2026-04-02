@@ -1,0 +1,110 @@
+---
+title: "Claude Code 手册拆读 10：Git 工作流集成"
+date: "2026-01-16T13:02:00+08:00"
+slug: "6ab432fc"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "工作流方法论"
+summary: "让 Claude Code 深度参与提交、PR、review 与分支协作，而不是只生成命令建议。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Claude Code 是天生的 Git 原住民。从生成 commit message、创建 PR，到双会话 Code Review 模 式，它能将 Git 工作流中最耗时的环节全部自动化，同时保持可审查性和安全性。</p>
+
+<p>Git 集成的基础能力 Claude Code 原生集成了 git 命令和 gh CLI，理解 GitHub 工作流的全部概念。你可以用自然语言描述 Git 操 作，Claude 会正确翻译并执行：</p>
+
+<p>自然语言指令 | Claude 执行的命令</p>
+
+<p>&quot;查看这次改动了哪些文件&quot; git status &amp;&amp; git diff --stat &quot;这次改动和 main 的差异&quot; git diff main...HEAD &quot;最近 5 个 commit 做了什么&quot; git log --oneline -5 &quot;找到引入这个 bug 的 commit&quot; git log -p --follow -S &quot;buggy_function&quot; &quot;在新分支上开始这个功能&quot; git checkout -b feat/feature-name 手写 commit message 是开发者最容易&quot;偷懒&quot;的环节，结果是项目历史变成&quot;fix bug&quot;、&quot;update&quot;、&quot;test&quot;的乱 账。Claude Code 可以根据实际改动生成规范、有意义的 commit message。</p>
+
+<p>基础用法 检查 git diff，生成一条描述性的 commit message。</p>
+
+<p>指定规范格式 - feat: 新功能 - fix: bug 修复 - docs: 文档更新 - refactor: 重构（不影响功能） - test: 测试相关 - chore: 构建/工具链 格式：type(scope): 简短描述（中文） 正文（可选）：</p>
+
+<p>说明&quot;为什么&quot;而不只是&quot;做了什么&quot;。</p>
+
+<p>含正文的完整 Commit 提交这次改动，commit message 需要：</p>
+
+<p>1. 第一行：type(scope): 描述（50字以内） 2. 空一行 3. 正文：解释为什么做这个改动，而不只是列出改了什么 4. 如果有 breaking change，在正文结尾加 BREAKING CHANGE: 说明 在 CLAUDE.md 中固化 Commit 规范 # Git 规范 - 格式：type(scope): 描述（中文，祈使句） - 正文必须说明&quot;为什么&quot;而不只是&quot;做了什么&quot; - Breaking change 必须在正文中标注 - 不使用 --no-verify 跳过 hook - 不使用 --force 推送 main 分支 Claude Code 通过 gh pr create 创建 PR，可以自动总结改动、填充描述模板，并处理整个推送流程。</p>
+
+<p>基础 PR 创建 将当前分支推送到远程，创建 PR，目标分支是 main。</p>
+
+<p>PR 标题用一行描述核心改动，描述包含改动摘要。</p>
+
+<p>完整 PR 创建（含描述模板） 创建 PR，PR 描述使用以下模板：</p>
+
+<p>## 改动摘要 （3 点以内，说明做了什么） ## 动机 （为什么需要这个改动？解决了什么问题？） ## 测试计划 （如何验证改动正确？列出测试步骤或测试用例） ## 风险与注意事项 （可能影响的模块、需要关注的边界情况） ## 相关链接 （关联的 Issue、设计稿、文档链接） 从 Issue 创建 PR 使用 &#x27;gh issue view 1234&#x27; 查看 issue 详情， 理解问题，在代码库中找到相关文件， 实现修复，写测试验证， 确保代码通过 lint 和类型检查， 创建带描述性 commit message 的 PR， 在 PR 描述中关联 closes #1234。</p>
+
+<p>PR 创建后的会话链接 PR 创建后，当前会话自动链接到该 PR。后续可以通过以下命令恢复会话，继续处理 Review 意见：</p>
+
+<p>工作流技巧：每个 PR 对应一个 Session，通过 --from-pr 可以恢复完整的历史上下文，让 Claude 清楚地知 道这个 PR 的来龙去脉，处理 Review 意见时无需重新解释背景。</p>
+
+<p>这是 Claude Code 最强大的 Git 工作流模式之一。单一会话中，Claude 往往对自己写的代码有&quot;盲点&quot;——它清 楚自己的设计意图，反而看不出潜在问题。双会话模式通过隔离审查来消除这种偏见。</p>
+
+<p>模式架构 代码实现 审查反馈</p>
+
+<p>编写者 | →</p>
+
+<p>生成改动 | →</p>
+
+<p>审查者 | →</p>
+
+<p>返回 A 修复 Session A（编写者）的指令 为 /api/users/profile 端点实现请求限流中间件。</p>
+
+<p>要求：</p>
+
+<p>- 每个用户每分钟最多 60 次请求 - 超限后返回 429 状态码，附带 Retry-After 头 - 使用 Redis 存储计数器，key 格式：rate_limit:{userId}:{minute} - 参照 src/middleware/auth.ts 的中间件风格实现 Session B（审查者）的指令 以严格的 Code Reviewer 身份审查 @src/middleware/rateLimiter.ts。</p>
+
+<p>重点检查：</p>
+
+<p>1. 边界情况：跨分钟边界时计数器是否正确重置？</p>
+
+<p>2. 竞态条件：高并发下 Redis 操作是否原子性？</p>
+
+<p>3. 错误处理：Redis 连接失败时如何降级？</p>
+
+<p>4. 与现有中间件的一致性：错误格式、日志风格是否统一？</p>
+
+<p>5. 安全性：rate limit key 是否可被伪造？</p>
+
+<p>每个问题给出：</p>
+
+<p>- 文件名和行号 - 具体问题描述 - 建议的修复方案 将审查反馈交回 Session A 这是 Code Review 的反馈：</p>
+
+<p>[粘贴 Session B 的输出] 请逐条处理这些问题。每处理一个问题，说明你的修复方案。</p>
+
+<p>处理完成后，运行测试套件确认没有引入新问题。</p>
+
+<p>处理合并冲突 我在合并 feature/oauth 分支到 main 时遇到了冲突， 冲突在 src/auth/session.ts 中（已标记 &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD）。</p>
+
+<p>请帮我：</p>
+
+<p>1. 分析 HEAD（main）和 feature/oauth 两边的改动意图 2. 判断哪些改动应该保留，哪些应该合并 3. 给出最终的合并方案，同时保留两边的功能 4. 应用合并方案并验证测试通过 查看 Git 历史与代码演变 # 理解一个复杂类的设计演变 查看 UserService.ts 的 git log（最近 30 条 commit）， 解释这个类的主要功能是如何一步步添加进来的， 特别关注权限检查逻辑是什么时候引入的、为什么引入。</p>
+
+<p># 找到 bug 引入时机（用于 hotfix 优先级判断） 在 git log 中找到第一次引入 calculateTax() 函数的 commit， 分析它最初的设计意图，判断当前的 bug 是原始设计问题还是后续改动引入的。</p>
+
+<p># 理解某个&quot;奇怪&quot;决策的来龙去脉 这段代码为什么要用 setTimeout 延迟执行？</p>
+
+<p>解释这个设计决策背后的原因。</p>
+
+<p>并行工作树（Git Worktrees） 当你需要同时处理多个任务（如主线开发 + 紧急 Bug 修复）时，Git Worktrees 允许在同一个代码库的不同工 作目录并行启动多个 Claude 会话，互不干扰：</p>
+
+<p># 在独立工作树上开发新功能 # 在另一个工作树上修复紧急 bug（同一窗口的另一个标签页） 每个工作树对应一个独立的 git branch，修改完全隔离。完成后正常合并回主分支即可。</p>
+
+<p>核心建议 并行工作树特别适合&quot;等待 CI/CD 构建期间做其他事&quot;的场景。在功能开发的 Session 等待测试运行时，在另一 个工作树里同步处理 Issue 修复，零等待时间。</p>
+
+<p>Git 安全边界 Claude Code 对以下高风险 Git 操作有内置的安全意识，会请求你的明确确认，或直接拒绝执行：</p>
+
+<p>注意 以下操作需要你明确授权，Claude Code 不会自动执行：</p>
+
+<p>• git reset --hard 丢弃未提交的改动 • 直接在 main 分支上提交（应该使用 PR 流程） 如果 Claude 提议执行上述操作，你应该停下来思考是否真的需要这样做。大多数情况下都有更安全的替代方案 ——比如用 git revert 代替 git reset --hard，用 PR 代替直接推送 main。</p>

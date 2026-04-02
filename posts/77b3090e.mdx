@@ -1,0 +1,94 @@
+---
+title: "Claude Code 手册拆读 17：斜杠命令速查手册"
+date: "2026-02-05T22:56:00+08:00"
+slug: "77b3090e"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "命令与 Skills 系统"
+summary: "快速建立命令心智图，知道哪些命令负责会话、上下文、模型、工具和系统状态。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- §17.1 会话管理命令
+
+## 笔记整理
+
+<p>Claude Code 的斜杠命令是人机协作的快捷通道。本节梳理全部 60+ 条内置命令，并重点揭秘那些藏 在文档角落却极为高效的隐藏实用命令——从旁路提问的 /btw 到对话时间机器 /rewind，掌握它 们，你的工作节奏将发生质变。</p>
+
+<p>命令来源：三类 / 命令的关系 在 Claude Code 中，以 / 开头的命令来自三个截然不同的来源，理解这一点是掌握整个命令体系的前提：</p>
+
+<p>/命令</p>
+
+<pre><code>├── 内置命令（Built-in Commands）</code></pre>
+
+<pre><code>│ 硬编码实现，执行固定逻辑</code></pre>
+
+<pre><code>│ 如 /help、/clear、/compact、/model</code></pre>
+
+<pre><code>│</code></pre>
+
+<pre><code>├── 捆绑 Skills（Bundled Skills）</code></pre>
+
+<pre><code>│ 随 Claude Code 预装，但基于 Prompt 实现</code></pre>
+
+<pre><code>│ 可调度子 Agent、读文件、适应不同代码库</code></pre>
+
+<pre><code>│ 如 /batch、/simplify、/debug、/loop</code></pre>
+
+<pre><code>│</code></pre>
+
+<pre><code>└── 自定义 Skills（Custom Skills）</code></pre>
+
+<p>用户创建的 SKILL.md 文件</p>
+
+<h2>§17.1 会话管理命令</h2>
+
+<p>命令 | 语法 | 说明</p>
+
+<p>/clear /clear 清除对话历史，释放上下文。别名：/reset 、/new /compact /compact [指令] 压缩对话历史；可选传入聚焦指令，告知保留哪些上下文 /resume /resume [会话] 按 ID 或名称恢复历史会话，不传参则打开选择器。别名：/continue /rename /rename [名称] 重命名当前会话；不传参时自动从对话历史生成名称 /branch /branch [名称] 从当前对话创建分支，保留当前上下文另起一条探索线路。别名：/fork /rewind /rewind 回退对话和代码到之前某个节点，相当于对话的时间机器。别 名：/checkpoint 导出对话为纯文本；有文件名则直接写入，否则打开对话框 /export /export [文件 名] /exit /exit 退出 CLI。别名：/quit 隐藏利器 /branch 与 /rewind：这两条命令是探索性开发的核武器。/branch 让你可以在不丢失当前进度的情 况下，另开一条思路验证不同方案；/rewind 则是当 Claude 走偏时的后悔药——在对话历史中选定一个检查 点，一键回到那个状态，代码也跟着还原。</p>
+
+<h2>§17.2 上下文与记忆命令</h2>
+
+<p>命令 | 语法 | 说明</p>
+
+<p>/context /context 以彩色网格可视化当前上下文用量，显示优化建议和容量警告 /memory /memory 编辑 CLAUDE.md 记忆文件，管理自动记忆（auto-memory） /init /init 初始化项目的 CLAUDE.md 指南；设置 CLAUDE_CODE_NEW_INIT=true 启动 交互式向导 向当前会话添加新的工作目录，用于多仓库协同场景 /add-dir /add-dir &lt;路径 &gt; /copy /copy [N] 复制最后一条回复到剪贴板；/copy 2 复制倒数第二条；有代码块时显示选择 器</p>
+
+<h2>§17.3 模型与配置命令</h2>
+
+<p>命令 | 语法 | 说明</p>
+
+<p>/model /model [模型名] 选择或切换 AI 模型；支持左右箭头调整 Effort 等级；立 即生效 设置 Effort 等级。low/medium/high 跨会话持久；max /effort /effort 仅当前会话（需 Opus 4.6）；auto 重置为默认 /config /config 打开设置界面，调整主题、模型、输出风格等。别 名：/settings /theme /theme 切换颜色主题，包括明暗变体、色盲友好主题、ANSI 主 题 /color /color [颜色|default] 设置当前会话提示栏颜色 /vim /vim 在 Vim 和普通编辑模式之间切换 /fast /fast [on|off] 切换快速模式 /keybindings /keybindings 打开或创建快捷键配置文件</p>
+
+<h2>§17.4 开发工具命令</h2>
+
+<p>命令 | 语法 | 说明</p>
+
+<p>/diff /diff 打开交互式差异查看器，显示未提交更改和每轮对话的差异 /plan /plan 直接从提示栏进入计划模式，让 Claude 先规划再执行 /security-review /security-review 分析当前分支的待提交更改，识别注入、权限、数据暴露等 安全风险 /pr-comments /pr-comments [PR] 获取 GitHub PR 评论；自动检测当前分支的 PR，需要 gh 为仓库设置 Claude GitHub Actions 集成 安装 Claude Slack 应用，打通 IM 协作</p>
+
+<h2>§17.5 Skills 与 Agent 管理命令</h2>
+
+<p>命令 | 说明</p>
+
+<p>/skills 列出所有可用的 Skills，包括自动触发状态 /agents 管理 Agent 配置 /tasks 列出并管理后台任务 /permissions 查看或更新权限设置。别名：/allowed-tools /hooks 查看工具事件的 Hook 配置</p>
+
+<h2>§17.6 账户、统计与系统命令</h2>
+
+<p>命令 | 说明</p>
+
+<p>/cost 显示 Token 使用统计 /usage 显示套餐使用限额和频率限制状态 /stats 可视化每日使用、历史会话、连续打卡、模型偏好 /insights 生成分析 Claude Code 会话的深度报告——使用模式、效率瓶颈、改进建议 /status 显示版本、模型、账户、连接情况 /doctor 诊断并验证 Claude Code 安装和设置，排查环境问题 /btw /btw &lt;问题&gt;：提一个不加入对话历史的旁路问题，不污染上下文地快速查询 /feedback 提交反馈。别名：/bug /release-notes 查看完整更新日志 /help 显示帮助和可用命令列表 隐藏利器 /btw：/btw 这个函数的时间复杂度是多少？ ——这条命令让你在不打断当前任务上下文的情况下，临 时问一个小问题。Claude 会回答，但这次问答不会被计入上下文历史，非常适合随手查阅而不想干扰主线任务 的场景。</p>
+
+<h2>§17.7 捆绑 Skills（预装）</h2>
+
+<p>这些 Skill 随 Claude Code 预装，基于 Prompt 实现，调用方式与自定义 Skill 完全相同：</p>
+
+<p>Skill 语法说明 /batch /batch &lt;指令&gt; 并行编排大规模代码库变更。将任务分解为 5~30 个独立单元，每单元启动一 个子 Agent 在隔离 git worktree 中执行并提 PR /claude-api 加载 Claude API 参考文档（Python/TypeScript/Java/Go 等）。检测到 anthropic 导入时自动激活 /debug /debug [描述] 读取会话调试日志排查问题，可选传入问题描述以聚焦分析 按指定间隔重复执行提示，适合轮询部署、监控 PR、等待条件满足 /loop /loop [间隔] &lt; 提示&gt; 并行启动三个审查 Agent 检查最近修改的文件，聚合发现并应用修复 /simplify /simplify [聚 焦]</p>
+
+<h2>§17.8 平台特定命令速查</h2>
+
+<p>命令 | 适用条件 | 说明</p>
+
+<p>/desktop macOS / Windows 在 Claude Code 桌面应用中继续当前会话。别名：/app /voice Claude.ai 账户切换推送说话的语音听写 /sandbox 支持的平台切换沙盒模式 /terminal-setup VS Code 等终端配置 Shift+Enter 等终端快捷键 /mobile — 显示下载 Claude 移动应用的二维码。别名：/ios 、/android /mcp — 管理 MCP 服务器连接和 OAuth 认证 /ide — 管理 IDE 集成并显示状态 /remote-control — 让当前会话可被 claude.ai 远程控制。别名：/rc /privacy-settings Pro/Max 套餐查看和更新隐私设置 /upgrade Pro/Max 套餐打开升级页面 核心建议 MCP 服务器还可以动态暴露命令，格式为 /mcp__&lt;服务器名&gt;__&lt;提示名&gt;，随着你接入的 MCP 服务器增多， 可用命令库会自动扩展。</p>

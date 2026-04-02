@@ -8,12 +8,7 @@ import Layout, { GradientBackground } from '../components/Layout';
 import ArrowIcon from '../components/ArrowIcon';
 import { getGlobalData } from '../utils/global-data';
 import SEO from '../components/SEO';
-import {
-  formatDisplayDate,
-  formatDisplayDateTime,
-  formatTimelineDate,
-  getDateParts,
-} from '../utils/date-utils';
+import { formatDisplayDate, formatTimelineDate, getDateParts } from '../utils/date-utils';
 
 const getTimestamp = (dateValue = '') => {
   const normalized = `${dateValue}`.replace(' ', 'T');
@@ -337,40 +332,47 @@ export default function Index({ posts, globalData }) {
     <Layout>
       <SEO title={globalData.name} description={globalData.blogDescription} />
       <Header name={globalData.name} />
-      <main className="grid items-start gap-14 pt-6 lg:grid-cols-[minmax(240px,0.92fr)_minmax(0,1.5fr)] lg:gap-16 xl:grid-cols-[minmax(240px,0.88fr)_minmax(0,1.34fr)_minmax(360px,0.98fr)] xl:gap-14">
-        <aside className="lg:sticky lg:top-24">
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/45 bg-white/30 px-7 py-8 shadow-[0_18px_70px_rgba(230,198,168,0.18)] backdrop-blur-[24px] dark:border-white/10 dark:bg-white/6 dark:shadow-[0_22px_70px_rgba(0,0,0,0.24)]">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08))] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
+      <main className="grid items-start gap-10 pt-4 lg:grid-cols-[minmax(280px,0.94fr)_minmax(0,1.5fr)] lg:gap-12 xl:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.38fr)_minmax(360px,0.98fr)] xl:gap-12">
+        <aside className="lg:sticky lg:top-20">
+          <div className="glass-panel rounded-[2rem] px-7 py-8">
             <div className="relative">
-              <p className="text-[11px] font-semibold tracking-[0.4em] uppercase opacity-45">
-                Notebook
-              </p>
-              <h1 className="mt-5 max-w-sm text-[2.85rem] leading-none md:text-[3.45rem] lg:text-[3.85rem]">
+              <p className="section-kicker">Personal archive</p>
+              <h1 className="mt-5 max-w-sm text-[3rem] leading-[0.92] md:text-[3.7rem] lg:text-[4.1rem]">
                 {globalData.blogTitle}
               </h1>
-              <p className="max-w-xs mt-6 text-base leading-8 opacity-68 md:text-lg">
+              <p className="mt-6 max-w-sm text-base leading-8 opacity-70 md:text-lg">
                 {globalData.blogDescription}
               </p>
 
-              <div className="grid grid-cols-2 gap-6 pt-8 mt-10 border-t border-black/10 dark:border-white/10">
-                <div>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <span className="tech-pill">
+                  <span className="pulse-glow h-2 w-2 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-3))]" />
+                  Quiet signal
+                </span>
+                <Link href="/tags" className="tech-pill">
+                  Explore tags
+                </Link>
+              </div>
+
+              <div className="mt-10 grid grid-cols-2 gap-4">
+                <div className="stat-tile">
                   <p className="text-[11px] tracking-[0.3em] uppercase opacity-45">
                     Articles
                   </p>
-                  <p className="mt-2 text-3xl">{posts.length}</p>
+                  <p className="mt-3 text-3xl">{posts.length}</p>
                 </div>
-                <div>
+                <div className="stat-tile">
                   <p className="text-[11px] tracking-[0.3em] uppercase opacity-45">
                     Latest
                   </p>
-                  <p className="mt-2 text-lg">
+                  <p className="mt-3 text-lg">
                     {formatDisplayDate(latestPost.data.date)}
                   </p>
                 </div>
               </div>
 
-              <div className="pt-8 mt-10 space-y-3 text-sm leading-7 border-t border-black/10 dark:border-white/10">
-                <p className="opacity-52">
+              <div className="mt-8 rounded-[1.4rem] border border-black/10 bg-white/[0.38] px-4 py-4 text-sm leading-7 opacity-72 dark:border-white/10 dark:bg-white/[0.03]">
+                <p>
                   {formatDisplayDate(latestPost.data.date)} to{' '}
                   {formatDisplayDate(oldestPost.data.date)}
                 </p>
@@ -380,7 +382,7 @@ export default function Index({ posts, globalData }) {
         </aside>
 
         <section className="w-full min-w-0 lg:px-2 xl:px-4">
-          <ol>
+          <ol className="space-y-4">
             {posts.map((post, index) => {
               const { year } = getDateParts(post.data.date);
               const previousYear =
@@ -390,11 +392,9 @@ export default function Index({ posts, globalData }) {
               return (
                 <Fragment key={post.slug}>
                   {showYearMarker && (
-                    <li className="pt-8 first:pt-2">
-                      <div className="flex items-center gap-4 pb-4 border-b border-black/10 dark:border-white/10">
-                        <span className="text-[11px] font-semibold tracking-[0.38em] uppercase opacity-35">
-                          Year
-                        </span>
+                    <li className="pt-8 first:pt-0">
+                      <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4 dark:border-white/10">
+                        <span className="section-kicker">Year</span>
                         <h3 className="text-2xl md:text-3xl">{year}</h3>
                       </div>
                     </li>
@@ -402,10 +402,11 @@ export default function Index({ posts, globalData }) {
 
                   <li
                     id={`post-${post.slug}`}
-                    className={`scroll-mt-28 rounded-[1.6rem] border-b transition-all duration-300 ${
+                    style={{ animationDelay: `${Math.min(index * 45, 420)}ms` }}
+                    className={`story-card animate-fade-up scroll-mt-28 rounded-[1.85rem] border transition-all duration-300 ${
                       activeSlug === post.slug
-                        ? 'border-primary/30 bg-white/34 px-5 shadow-[0_16px_44px_rgba(233,197,166,0.2)] backdrop-blur-[18px] dark:border-primary/25 dark:bg-white/8 dark:shadow-[0_16px_40px_rgba(0,0,0,0.2)]'
-                        : 'border-black/10 dark:border-white/10'
+                        ? 'border-primary/[0.26] bg-white/70 px-5 shadow-[0_30px_70px_-38px_rgba(77,141,255,0.34)] backdrop-blur-[20px] dark:border-primary/20 dark:bg-[rgba(10,18,30,0.74)] dark:shadow-[0_30px_70px_-34px_rgba(2,6,23,0.72)]'
+                        : 'border-black/10 bg-white/[0.28] px-5 backdrop-blur-[18px] hover:border-primary/[0.18] hover:bg-white/[0.44] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]'
                     }`}
                   >
                     <Link
@@ -418,7 +419,7 @@ export default function Index({ posts, globalData }) {
                           timelineScrollTop: getTimelineScrollTopForSlug(post.slug),
                         });
                       }}
-                      className="group grid items-start gap-5 py-7 transition-colors md:grid-cols-[118px_minmax(0,1fr)_28px]"
+                      className="group grid items-start gap-5 py-7 transition-colors md:grid-cols-[128px_minmax(0,1fr)_28px]"
                     >
                       <div
                         className={`pt-1 text-sm font-semibold tracking-[0.16em] uppercase transition-colors duration-300 ${
@@ -435,7 +436,7 @@ export default function Index({ posts, globalData }) {
 
                       <div className="min-w-0">
                         <h4
-                          className={`text-[1.9rem] leading-tight transition-all duration-300 group-hover:translate-x-1 ${
+                          className={`text-[1.85rem] leading-tight transition-all duration-300 group-hover:translate-x-1 md:text-[2rem] ${
                             activeSlug === post.slug ? 'text-primary' : ''
                           }`}
                         >
@@ -455,10 +456,10 @@ export default function Index({ posts, globalData }) {
                             {post.data.tags.slice(0, 3).map((tag) => (
                               <span
                                 key={`${post.slug}-${tag}`}
-                                className={`px-3 py-1 text-[11px] tracking-[0.2em] uppercase rounded-full ${
+                                className={`rounded-full px-3 py-1 text-[11px] tracking-[0.2em] uppercase ${
                                   activeSlug === post.slug
-                                    ? 'bg-primary/10 text-primary dark:bg-primary/15'
-                                    : 'bg-black/5 dark:bg-white/10'
+                                    ? 'border border-primary/15 bg-primary/10 text-primary dark:bg-primary/15'
+                                    : 'border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/10'
                                 }`}
                               >
                                 {tag}
@@ -481,18 +482,17 @@ export default function Index({ posts, globalData }) {
           </ol>
         </section>
 
-        <aside className="hidden xl:sticky xl:top-24 xl:block xl:self-start">
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/45 bg-white/28 shadow-[0_18px_70px_rgba(232,198,166,0.2)] backdrop-blur-[26px] dark:border-white/10 dark:bg-white/6 dark:shadow-[0_22px_70px_rgba(0,0,0,0.28)]">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08))] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[rgba(252,248,244,0.95)] via-[rgba(252,248,244,0.74)] to-transparent dark:from-[rgba(16,18,24,0.96)] dark:via-[rgba(16,18,24,0.72)] dark:to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-18 bg-gradient-to-t from-[rgba(252,248,244,0.95)] via-[rgba(252,248,244,0.74)] to-transparent dark:from-[rgba(16,18,24,0.96)] dark:via-[rgba(16,18,24,0.72)] dark:to-transparent" />
-            <div className="pointer-events-none absolute inset-y-6 left-1/2 z-[1] w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(223,135,98,0.28),rgba(223,135,98,0.16),rgba(223,135,98,0.06))] dark:bg-[linear-gradient(180deg,rgba(241,147,105,0.34),rgba(241,147,105,0.16),rgba(255,255,255,0.06))]" />
-            <div className="timeline-bob pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/62 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] opacity-75 shadow-[0_10px_26px_rgba(236,210,182,0.28)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.22)]">
+        <aside className="hidden xl:sticky xl:top-20 xl:block xl:self-start">
+          <div className="glass-panel rounded-[2rem]">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[rgba(248,251,255,0.94)] via-[rgba(248,251,255,0.76)] to-transparent dark:from-[rgba(8,14,24,0.96)] dark:via-[rgba(8,14,24,0.72)] dark:to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[4.5rem] bg-gradient-to-t from-[rgba(248,251,255,0.94)] via-[rgba(248,251,255,0.76)] to-transparent dark:from-[rgba(8,14,24,0.96)] dark:via-[rgba(8,14,24,0.72)] dark:to-transparent" />
+            <div className="pointer-events-none absolute inset-y-6 left-1/2 z-[1] w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(77,141,255,0.32),rgba(77,141,255,0.12),rgba(77,141,255,0.04))]" />
+            <div className="timeline-bob pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.72] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] opacity-78 shadow-[0_14px_28px_rgba(77,141,255,0.12)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.22)]">
               <span className="block h-4 w-px bg-black/20 dark:bg-white/24" />
               Scroll
             </div>
-            <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-white/50 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] opacity-78 shadow-[0_10px_24px_rgba(236,210,182,0.18)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.16)]">
-              Tree Archive
+            <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-white/50 bg-white/[0.66] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] opacity-78 shadow-[0_10px_24px_rgba(77,141,255,0.1)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.16)]">
+              Archive map
             </div>
             <button
               type="button"
@@ -506,7 +506,7 @@ export default function Index({ posts, globalData }) {
 
                 timelineRail.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/68 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.3em] shadow-[0_10px_24px_rgba(235,209,180,0.24)] backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-black/28 dark:shadow-[0_12px_24px_rgba(0,0,0,0.2)] ${
+              className={`absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.72] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.3em] shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-black/28 dark:shadow-[0_12px_24px_rgba(0,0,0,0.2)] ${
                 isTimelineScrolled
                   ? 'translate-y-0 opacity-100'
                   : 'pointer-events-none translate-y-2 opacity-0'
@@ -525,15 +525,15 @@ export default function Index({ posts, globalData }) {
                   <span
                     className={`absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 ${
                       activeYear === year
-                        ? 'scale-110 border-primary/45 bg-primary/55 shadow-[0_0_0_6px_rgba(223,135,98,0.12)]'
-                        : 'border-black/12 bg-[rgba(248,244,238,0.96)] dark:border-white/16 dark:bg-[#0f1318]'
+                        ? 'scale-110 border-primary/45 bg-primary/55 shadow-[0_0_0_6px_rgba(77,141,255,0.14)]'
+                        : 'border-black/12 bg-[rgba(248,251,255,0.96)] dark:border-white/16 dark:bg-[#0f1318]'
                     }`}
                   />
                   <h3
                     className={`relative rounded-full border px-4 py-1 text-[10px] font-semibold tracking-[0.36em] uppercase transition-all duration-300 ${
                       activeYear === year
-                        ? 'border-primary/28 bg-primary/10 text-primary shadow-[0_10px_24px_rgba(223,135,98,0.12)]'
-                        : 'border-black/8 bg-white/50 opacity-72 dark:border-white/10 dark:bg-white/8'
+                        ? 'border-primary/28 bg-primary/10 text-primary shadow-[0_10px_24px_rgba(77,141,255,0.12)]'
+                        : 'border-black/10 bg-white/50 opacity-72 dark:border-white/10 dark:bg-white/8'
                     }`}
                   >
                     {year}
@@ -572,8 +572,8 @@ export default function Index({ posts, globalData }) {
                         <span
                           className={`absolute left-1/2 top-[42px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 group-hover:scale-110 ${
                             activeSlug === post.slug
-                              ? 'border-primary/45 bg-primary/60 shadow-[0_0_0_5px_rgba(223,135,98,0.12)]'
-                              : 'border-black/12 bg-[rgba(248,244,238,0.96)] dark:border-white/20 dark:bg-[#10141a]'
+                              ? 'border-primary/45 bg-primary/60 shadow-[0_0_0_5px_rgba(77,141,255,0.12)]'
+                              : 'border-black/12 bg-[rgba(248,251,255,0.96)] dark:border-white/20 dark:bg-[#10141a]'
                           }`}
                         />
                         <div
@@ -586,8 +586,8 @@ export default function Index({ posts, globalData }) {
                           <div
                             className={`rounded-[1.2rem] border px-4 py-3 transition-all duration-300 ${
                               activeSlug === post.slug
-                                ? 'border-primary/28 bg-white/72 shadow-[0_16px_30px_rgba(223,135,98,0.16)] dark:border-primary/24 dark:bg-white/12'
-                                : 'border-white/45 bg-white/42 hover:bg-white/60 dark:border-white/8 dark:bg-white/6 dark:hover:bg-white/10'
+                                ? 'border-primary/28 bg-white/[0.78] shadow-[0_18px_32px_rgba(77,141,255,0.14)] dark:border-primary/24 dark:bg-white/12'
+                                : 'border-white/45 bg-white/[0.46] hover:bg-white/[0.64] dark:border-white/8 dark:bg-white/6 dark:hover:bg-white/10'
                             }`}
                           >
                             <p
@@ -625,11 +625,11 @@ export default function Index({ posts, globalData }) {
       <Footer copyrightText={globalData.footerText} />
       <GradientBackground
         variant="large"
-        className="fixed top-10 opacity-20 dark:opacity-40"
+        className="fixed top-4 opacity-[0.26] dark:opacity-[0.44]"
       />
       <GradientBackground
         variant="small"
-        className="absolute bottom-0 opacity-10 dark:opacity-10"
+        className="absolute bottom-0 opacity-[0.16] dark:opacity-[0.14]"
       />
     </Layout>
   );

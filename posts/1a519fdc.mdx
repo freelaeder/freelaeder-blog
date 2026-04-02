@@ -1,0 +1,130 @@
+---
+title: "Claude Code 手册拆读 29：速查卡与模板库"
+date: "2026-03-15T01:21:00+08:00"
+slug: "1a519fdc"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "附录"
+summary: "整理常用命令、模板与决策卡，作为日常协作时可以直接翻用的工具箱。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>本附录汇集全书最常用的速查表、配置模板和决策工具，可作为日常使用的参考手册。所有代码块均 可直接复制使用。</p>
+
+<p>常用斜杠命令速查卡</p>
+
+<p>命令 | 功能 | 常用场景</p>
+
+<p>/help 显示帮助信息查找可用命令 /clear 清除上下文，开启新会话切换到无关任务前</p>
+
+<p>/compact [指令] | 压缩上下文，可指定保留重点 | 上下文超过 60% 时</p>
+
+<p>/cost 查看当前 session token 消耗成本监控 /context 查看上下文占用明细分析哪些内容占用空间 /stats 查看使用模式统计订阅用户可用 /model 切换当前使用的模型复杂任务切 Opus，简单任务切 Haiku /effort [low|medium|high] 调整推理深度（Extended Thinking） 控制 token 消耗 vs 质量 /permissions 查看和管理工具权限安全配置审计 /sandbox 启用 OS 级沙盒隔离处理不受信任的代码库 /config 修改配置项设置默认模型、语言等 /mcp 管理 MCP 服务器启用/禁用 MCP 工具 /plugin 浏览插件市场安装代码智能插件 /rename 重命名当前 session /clear 前保存会话名称 /resume 恢复之前的 session 继续中断的任务 /init 为当前项目生成 CLAUDE.md 项目初始化 /feedback 向 Anthropic 提交反馈报告可疑行为或 bug /bug 提交 bug 报告发现工具本身的问题 键盘快捷键速查</p>
+
+<p>快捷键 | 功能</p>
+
+<p>Shift+Tab 切换 Plan Mode（只分析不执行） Ctrl+G 在编辑器中打开当前计划，可直接编辑 Ctrl+C 中断当前操作 Esc 取消当前输入</p>
+
+<p>↑ / ↓ | 浏览历史输入</p>
+
+<p>工具优先级决策树 在执行搜索和分析任务时，遵循以下优先级选择工具：</p>
+
+<p>找文件位置？</p>
+
+<p>找代码内容？</p>
+
+<p>理解具体逻辑？</p>
+
+<p>任务目标 | →</p>
+
+<p>*.ts / src/** → → 用 Glob 用 Grep 用 Read 按需读 3–5 个文件 正则匹配 跨模块调查（不污染主上下文）：</p>
+
+<p>需要调查 启动子代理 子代理汇报 主会话</p>
+
+<p>多个模块 | →</p>
+
+<p>独立上下文 | →</p>
+
+<p>摘要结论 | →</p>
+
+<p>接收精炼结果 模型选择决策：</p>
+
+<p>简单/重复 架构/推理 日常编码</p>
+
+<p>任务复杂度 | →</p>
+
+<p>成本约 0.1x | →</p>
+
+<p>成本基准 | →</p>
+
+<p>成本约 5x CLAUDE.md 最小模板 可直接复制到项目根目录，然后按需填写各节内容：</p>
+
+<pre><code># [项目名称] — Claude Code 配置</code></pre>
+
+<p>## 项目概述 [一句话描述项目用途和技术栈] ## 构建与运行命令 # 开发服务器 # 运行测试（优先运行单个测试文件，而非整个套件） # 类型检查</p>
+
+<pre><code>```</code></pre>
+
+<p>## 代码风格 - 使用 ES modules（import/export），不用 CommonJS（require） - TypeScript strict 模式，所有函数必须有返回类型注解 - 组件文件使用 PascalCase，工具函数文件使用 camelCase ## 架构说明 - 认证服务在 src/auth/，session 存储用 Redis - 所有 API 路由都需经过 src/middleware/auth.ts 中间件 - 数据库模型在 src/models/，查询统一通过 src/repositories/ 层 ## Git 规范 - 格式：type(scope): description（中文描述） - 禁止直接推送到 main 分支 ## 压缩指令 使用 /compact 时，请重点保留：</p>
+
+<p>- 已修改的文件列表（含修改原因） - 关键测试命令 - 已确认的架构决策 - 当前正在处理的 bug 描述 ## 已知 Bug 模式 [在此记录已解决的非显而易见 bug，格式：症状 / 根因 / 解决方案] ## 环境变量 可选：LOG_LEVEL（默认 info）、PORT（默认 3000） 核心建议 CLAUDE.md 的黄金法则：对每一行问自己&quot;删掉这行会让 Claude 犯错吗？&quot;如果不会，就删掉。保持在 500 行以内，超出部分移到 Skill 文件（按需加载）。</p>
+
+<p>settings.json 最小模板 项目级配置（`.claude/settings.json`），可提交到 Git 供团队共享：</p>
+
+<p>{ ], ], ], }, { { } ] } ], { { } ] } ] }, }, }</p>
+
+<pre><code>全局配置（`~/.claude/settings.json`），仅影响当前用户，不提交到 Git：</code></pre>
+
+<p>{ ] } } Hook 脚本最小模板 危险命令拦截（`.claude/hooks/guard-bash.sh`）：</p>
+
+<p>DANGEROUS_PATTERNS=(&quot;rm -rf /&quot; &quot;rm -rf ~&quot; &quot;git push --force&quot; &quot;git push -f&quot; &quot;&gt; /dev/sda&quot; &quot;dd i jq -n --arg reason &quot;危险操作被安全策略阻止：$pattern&quot; \ &#x27;{hookSpecificOutput:{hookEventName:&quot;PreToolUse&quot;,permissionDecision:&quot;deny&quot;,permissionDe macOS 桌面通知（`~/.claude/hooks/notify.sh`）：</p>
+
+<p>osascript -e &quot;display notification \&quot;$MESSAGE\&quot; with title \&quot;$TITLE\&quot; sound name \&quot;Ping\&quot;&quot; 常见错误速查表</p>
+
+<p>症状 | 可能原因 | 解决方案</p>
+
+<p>Claude 一直问权限，</p>
+
+<p>未配置 allow 规则 | 在 settings.json 的 allow 列表中添加常用命令，如</p>
+
+<p>频繁中断 Prompt 过于宽泛，触发大量 精确指定文件路径和范围；及时使用 /compact；将大 上下文快速填满，性 操作委托给子代理 文件扫描 能下降 Claude 修复了症状但</p>
+
+<p>没有找到根因就急于修复 | 在 Prompt 中明确要求&quot;先定位根因再修复，不要压制错</p>
+
+<p>bug 复现 误&quot;；先在 Plan Mode 分析 简单任务使用 /effort low；CI 环境设置 消耗大量 token ultrathink 触发 CLAUDE.md 内容被 文件过长（超过 500 行），关 精简 CLAUDE.md，将复杂工作流指令移到 Skill 文件 Claude 忽略 键指令被淹没 Hook 配置了但没有 matcher 正则不匹配，或 用 /permissions 确认配置已加载；检查 matcher 正 settings.json 路径错误 则是否正确匹配工具名称 触发 Hook 退出码非零但</p>
+
+<p>使用了非零但非 2 的退出码 | 阻止执行必须用退出码 2 ，其他非零码只记录日志不阻</p>
+
+<p>执行没有被阻止 止 在 Prompt 末尾加&quot;完成后向我汇报[具体信息]&quot;，不要要 子代理结果不返回主 子代理任务描述没有要求汇报 求完整日志 摘要 会话 Claude 读取了 .env 未配置 deny 规则在 settings.json 的 deny 列表中添加 Read(./.env) 文件中的密钥</p>
+
+<p>MCP 服务器连接失败 | 服务器地址配置错误或服务未</p>
+
+<p>用 /mcp 检查连接状态；查看 stderr 日志（-- verbose 模式） 启动 git commit 附带了 attribution.commit 配置了署 Claude 署名 名文本 非交互模式（-p）无 任务需要用户确认或 stdin 输 添加 --allowedTools 预授权工具；或用 -- 法使用 dangerously-skip-permissions （仅限受信任环境） 入 Skill 文件最小模板 --- description: 一句话描述这个 Skill 的用途（显示在 /skill 列表中）</p>
+
+<pre><code>model: claude-sonnet-4-6 # 可选，覆盖默认模型</code></pre>
+
+<p>---</p>
+
+<pre><code># [Skill 名称]</code></pre>
+
+<p>## 使用场景 [描述何时调用这个 Skill] ## 工作流 1. [步骤一] 2. [步骤二] 3. [步骤三] ## 输出规范 [描述期望的输出格式] ## 注意事项 - [重要约束或例外情况] 常用权限规则参考</p>
+
+<p>规则语法 | 匹配范围 | 建议放入</p>
+
+<p>Bash(npm run *) 所有 npm run 命令 allow Bash(git diff *) 所有 git diff 命令 allow Bash(git push *) 所有 git push 命令 ask Bash(docker *) 所有 docker 命令 ask Bash(rm -rf *) 强制递归删除 deny Bash(curl *) 所有 curl 网络请求 deny（按需放 ask） Read(./.env) 读取 .env 文件 deny Read(./secrets/**) 读取 secrets 目录 deny Edit(./src/**) 编辑 src 目录所有文件 allow WebFetch(domain:api.example.com) 向指定域名的请求 allow（白名单） WebFetch 所有外部 HTTP 请求 deny（高安全场景） mcp__github__create_issue 特定 MCP 工具操作 ask 权限规则求值顺序：deny &gt; ask &gt; allow，第一个匹配规则立即生效，后续规则不再评估。配置时先写 deny， 再写 ask，最后写 allow，顺序即为安全优先级。</p>
+
+<p>Claude Code 最佳实践手册 AI创世记 公众号「玄清智流」· B站「天天悅看」 每周分享 AI 工具深度使用技巧 Claude Code · Cursor · 工作流自动化 加入知识星球 →</p>
+
+<p>B站：天天悅看 | · | 公众号：玄清智流</p>
+
+<p>本手册由 Claude Code 多 Agent 协作生成，内容仅供参考。</p>

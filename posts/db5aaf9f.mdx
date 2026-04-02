@@ -1,0 +1,114 @@
+---
+title: "Claude Code 手册拆读 14：Hooks 自动化系统"
+date: "2026-01-27T20:28:00+08:00"
+slug: "db5aaf9f"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "Hooks 自动化"
+summary: "把 Claude Code 生命周期变成可编排的自动化节点，接入审计、校验、通知与守护逻辑。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Hooks 是 Claude Code 生命周期中的自动化插槽——在工具执行前后、通知发出时、任务结束前，用 户自定义的脚本会被精确触发。掌握 Hooks，就是把 Claude Code 从&quot;聊天助手&quot;升级为&quot;可编程自动 化引擎&quot;。</p>
+
+<p>什么是 Hooks Hooks 是在 Claude Code 运行时特定节点自动执行的用户自定义命令，支持 shell 脚本、HTTP 端点、LLM 提 示或子代理四种形式。每个 hook 通过 stdin 接收 JSON 上下文，通过 stdout 返回决策 JSON，通过退出码控 制行为。</p>
+
+<p>核心价值：Hooks 让你在不修改 Claude Code 源码的前提下，为所有 AI 操作增加合规检查、自动化后处理和 智能通知能力。</p>
+
+<p>生命周期全景图 Claude Code 的完整执行生命周期如下，Hooks 在四个关键节点介入：</p>
+
+<p>工具执行</p>
+
+<p>会话启动 | →</p>
+
+<p>工具调用前 | →</p>
+
+<p>Bash / Edit / Write… →</p>
+
+<p>工具完成后 | →</p>
+
+<p>任务结束前 并行触发的 Notification hook 在任何需要通知用户的时刻异步激活（权限确认、空闲等待等），与主流程独立 运行。子代理（Subagent）拥有各自独立的 SubagentStart / SubagentStop 事件。</p>
+
+<p>四大 Hook 事件类型 PreToolUse — 工具执行前拦截 触发时机：Claude 调用任何工具之前，在权限检查之前。这是最强力的拦截点，可以完全阻止工具执行。</p>
+
+<p>stdin 格式：</p>
+
+<p>{ }, } stdout 决策格式：</p>
+
+<p>{ &quot;permissionDecisionReason&quot;: &quot;该命令已被安全策略阻止&quot;, &quot;additionalContext&quot;: &quot;已记录到审计日志&quot; } } permissionDecision 三个取值的含义：</p>
+
+<p>取值 | 含义 | 后续行为</p>
+
+<p>&quot;allow&quot; 直接允许跳过后续所有权限检查，工具立即执行 &quot;deny&quot; 拒绝执行向 Claude 返回拒绝原因，Claude 可调整后重试 &quot;ask&quot; 交由用户决定弹出权限确认对话框（默认行为） PostToolUse — 工具执行后处理 触发时机：工具执行完毕、结果返回给 Claude 之前。此时可以对结果进行后处理，也可以阻止 Claude 继续执 行。</p>
+
+<p>stdin 格式：</p>
+
+<p>{ }, } } 阻止 Claude 继续的输出格式：</p>
+
+<p>{ &quot;reason&quot;: &quot;ESLint 检测到 3 个错误，请先修复后再继续&quot; } Notification — 异步通知事件 触发时机：Claude Code 需要通知用户时自动激活，典型场景包括等待权限确认（permission_prompt ）、 Claude 空闲等待用户输入（idle_prompt ）。</p>
+
+<p>stdin 格式：</p>
+
+<p>{ &quot;message&quot;: &quot;Claude 需要你的确认才能继续&quot;, } notification_type 完整取值：</p>
+
+<p>类型值 | 触发场景</p>
+
+<p>permission_prompt 等待用户手动确认权限 idle_prompt Claude 完成当前轮次，等待用户下一条输入 auth_success 认证成功 elicitation_dialog 需要用户提供额外信息 核心建议 Notification hook 为纯通知性质，Claude Code 会忽略其 stdout 输出。应始终设置 &quot;async&quot;: true，避免 通知延迟阻塞主流程。</p>
+
+<p>Stop — 任务完成前的守门人 触发时机：Claude 认为任务已完成、准备停止之前。这是质量把关的最后防线。</p>
+
+<p>stdin 格式：</p>
+
+<p>{ &quot;last_assistant_message&quot;: &quot;我已完成了所有修改。&quot; } 注意 stop_hook_active 字段至关重要：当值为 true 时，表示此次 Stop 是由 hook 阻止后 Claude 重新触发 的。必须检查此字段并在 true 时允许停止，否则将陷入无限循环。</p>
+
+<p>阻止停止的输出：</p>
+
+<p>{ &quot;reason&quot;: &quot;未检测到单元测试通过证据，请运行 npm test 并确认全部通过&quot; } 允许停止：直接 exit 0 不输出任何内容，或输出 {&quot;decision&quot;: &quot;allow&quot;}。</p>
+
+<p>退出码规范 退出码是 command 类型 hook 最重要的控制信号，三种行为截然不同：</p>
+
+<p>退出码 | 含义 | 行为</p>
+
+<p>0 | 正常退出 | Claude Code 解析 stdout 中的 JSON 决策</p>
+
+<p>2 | 阻止性错误 | 执行被阻止，stderr 内容直接反馈给 Claude</p>
+
+<p>其他非零 | 非阻止性错误 | 仅在详细模式记录错误，执行照常继续</p>
+
+<p>关键区别：只有退出码 2 才会真正阻止工具执行。其他非零退出码（如 1 ）只写错误日志，不影响主流程。</p>
+
+<p>Matcher 匹配模式 Matcher 是正则表达式，用于精确过滤 hook 触发条件，避免对每个工具调用都执行开销较大的脚本：</p>
+
+<p>{ { }, { }, { } ] } }</p>
+
+<p>事件 | Matcher 匹配字段 | 示例模式</p>
+
+<p>PreToolUse / PostToolUse 工具名称 Bash 、Edit|Write 、mcp__.* SessionStart 启动方式 startup 、resume 、clear Notification 通知类型 permission_prompt 、idle_prompt SubagentStart 代理类型 Explore 、Plan ConfigChange 配置来源 user_settings 、project_settings 空字符串 &quot;&quot; 或省略 matcher 字段，表示匹配所有事件。</p>
+
+<p>Hook 实现类型对比 Claude Code 支持四种 hook 实现方式，各有适用场景：</p>
+
+<p>类型 | 适用场景 | 优缺点</p>
+
+<p>command 本地 shell 脚本（最常用） 灵活强大，无网络依赖；需要本地环境 http 调用远端服务端点适合团队共享逻辑；需要网络可达 prompt 语义判断（如意图识别） 理解自然语言；消耗额外 token 和延迟 agent 多步骤复杂验证可使用 Read/Grep 工具；开销最大 async 模式：将 hook 的 &quot;async&quot;: true 设置后，脚本在后台执行，不阻塞主流程。适合发通知、写日志等纯 副作用操作。</p>
+
+<p>Hooks 配置文件位置 Hooks 配置写在 settings.json 的 &quot;hooks&quot; 字段中，支持四个作用域：</p>
+
+<p>文件路径 | 作用域 | 可提交 git</p>
+
+<pre><code>~/.claude/settings.json
+全局（所有项目）
+否</code></pre>
+
+<p>.claude/settings.json 项目（团队共享） 是 .claude/settings.local.json 项目（个人私有） 否（自动 gitignore） 插件 hooks/hooks.json 插件启用时生效是 核心建议 团队项目中，将安全策略 hook（如危险命令拦截）放入 .claude/settings.json 提交到 git，确保所有成员</p>
+
+<pre><code>使用一致的保护规则。将个人偏好 hook（如桌面通知）放入 ~/.claude/settings.json 全局配置。</code></pre>

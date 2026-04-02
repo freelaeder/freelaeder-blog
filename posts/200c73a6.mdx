@@ -1,0 +1,100 @@
+---
+title: "Claude Code 手册拆读 23：Agent Teams 协作"
+date: "2026-02-22T23:19:00+08:00"
+slug: "200c73a6"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "多 Agent 协作"
+summary: "通过多 Agent 流水线和网状协作，把复杂任务拆成可验证、可传递的中间产物。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Agent Teams 是 Claude Code 的实验性功能，允许多个 AI Agent 在网状拓扑中直接通信、互相挑 战、自我协调。与 Sub-agents 的&quot;汇报制&quot;不同，Agent Teams 更像一支真正的团队：成员之间可以 直接对话，共享任务列表，Lead 负责综合协调。</p>
+
+<p>两种架构对比：Hub-and-spoke vs Mesh Sub-agents 和 Agent Teams 代表了两种根本不同的 Agent 协作哲学：</p>
+
+<p>不推荐 推荐 Sub-agents：Hub-and-spoke（汇报制） Agent Teams：Mesh（网状直连） · 主会话作为中心枢纽（Hub） · Teammates 之间可以直接互发消息 · 子代理只能向主 Agent 单向汇报 · 共享任务列表，自主认领协调 · 子代理之间无法直接通信 · 支持&quot;辩论&quot;收敛复杂问题 · Context 完全隔离，结果精简返回 · 各自独立 context，但通信频繁 · 稳定可用，Token 成本较低 · 实验性，Token 成本随成员线性增长 · 最佳场景：专注任务、结果导向 · 最佳场景：复杂调研、需要辩论协商 Agent Teams 默认禁用，需要在配置中显式开启：</p>
+
+<p>{ } } 或在启动前设置环境变量：</p>
+
+<p># 最低版本要求：Claude Code v2.1.32+ 团队架构 团队结构</p>
+
+<pre><code>├── Team Lead（团队负责人）</code></pre>
+
+<pre><code>│ ├── 创建团队、生成任务列表</code></pre>
+
+<pre><code>│ ├── 将任务分配给 Teammates</code></pre>
+
+<pre><code>│ ├── 综合所有结果</code></pre>
+
+<pre><code>│ └── 负责清理团队资源</code></pre>
+
+<pre><code>├── Teammates（成员，数量可配置）</code></pre>
+
+<pre><code>│ ├── 各自独立的 context 窗口</code></pre>
+
+<pre><code>│ ├── 从共享任务列表认领任务</code></pre>
+
+<pre><code>│ ├── 可直接互相发消息</code></pre>
+
+<pre><code>│ └── 完成后通知 Lead</code></pre>
+
+<pre><code>└── 共享任务列表（Task List）</code></pre>
+
+<pre><code>├── 状态：pending / in-progress / completed</code></pre>
+
+<pre><code>├── 支持任务依赖关系配置</code></pre>
+
+<pre><code>└── 文件锁机制防止竞争认领</code></pre>
+
+<p>启动 Agent Team 的提示词写法</p>
+
+<p>1 | 基础启动：直接描述团队任务</p>
+
+<p>创建一个 agent 团队调查线上 bug：用户登录后应用崩溃。</p>
+
+<p>生成 3 个 teammate：</p>
+
+<p>- auth-investigator：调查认证流程 - session-investigator：调查会话管理 - devil-advocate：专门寻找反驳其他两人理论的证据 让他们互相讨论直到达成共识，然后汇报根因。</p>
+
+<p>2 | 并行代码审查（指定模型和数量）</p>
+
+<p>创建一个 4 人团队并行重构这些模块，每个 teammate 使用 Sonnet 模型：</p>
+
+<p>- frontend-refactor：重构 UI 组件层 - api-refactor：重构 API 接口层 - service-refactor：重构业务逻辑层 - test-refactor：更新对应测试用例</p>
+
+<p>3 | 要求计划审批（高风险任务）</p>
+
+<p>生成一个 architect teammate 重构认证模块。</p>
+
+<p>要求他在开始实施前提交完整的重构计划供我审批， 审批通过后再开始修改代码。</p>
+
+<p>SendMessage 通信机制 Agent Teams 中的通信通过消息系统（Mailbox）实现。Lead 可以向特定 Teammate 发消息，Teammates 之 间也可以直接通信：</p>
+
+<p>消息类型 | 发送方式 | 适用场景 | 成本</p>
+
+<p>message 点对点，发给指定 teammate 分配任务、请求结果、具体沟通低 broadcast 广播给所有 teammates 团队级通知、全员上下文同步高，谨慎使用</p>
+
+<p>空闲通知 | Teammate 完成时自动触发 | Lead 据此综合结果 | 无额外开销</p>
+
+<p>注意 broadcast 消息会被发送给所有 teammates，成本随团队规模线性增长。除非需要全员同步关键信息，否则优 先使用点对点 message。</p>
+
+<p>Sub-agents 模式中，主 Agent 也可以通过 SendMessage 恢复已完成的子代理继续工作——被恢复的子代理保 留完整的对话历史：</p>
+
+<p># 首次调用 使用 code-reviewer 子代理审查 auth 模块</p>
+
+<pre><code># [子代理完成，主 Agent 记录 agent ID]</code></pre>
+
+<p># 恢复继续工作 继续之前的 code-review，现在分析 authorization 逻辑 # Claude 自动用 SendMessage 恢复该子代理 质量门控 Hook Agent Teams 提供两个专属 Hook，在关键节点自动执行质量检查脚本：</p>
+
+<p>{ { { } ] } ], { { } ] } ] } } Hook 名称触发时机 Exit Code 2 效果 TeammateIdle Teammate 即将进入空闲状态时阻止进入空闲，让 Teammate 继续工作 TaskCompleted 任务即将被标记为 completed 时阻止标记完成，要求 Teammate 重做 显示模式配置 不推荐 推荐 in-process 模式（默认） split-panes 模式（需 tmux / iTerm2） · 所有 teammate 在主终端内运行 · 每个 teammate 拥有独立分屏面板 · Shift+Down 切换查看不同 teammate · 同时查看所有 teammate 的输出 · 任何终端均可使用，无需额外工具 · 点击面板直接与对应 teammate 交互 // settings.json 中配置 核心建议 权限继承规则：Teammates 以 Lead 的权限设置为起点。如果 Lead 使用了 --dangerously-skip- permissions，所有 teammates 也会跳过权限确认。高风险操作请确认 Lead 的权限设置是否合适。</p>

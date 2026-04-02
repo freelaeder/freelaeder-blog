@@ -1,0 +1,84 @@
+---
+title: "Claude Code 手册拆读 16：MCP Server 集成"
+date: "2026-02-04T15:13:00+08:00"
+slug: "cdda179b"
+tags:
+  - "Claude Code"
+  - "最佳实践"
+  - "Hooks 自动化"
+summary: "让 Claude Code 安全地连接外部系统，在本地代码之外获得结构化能力扩展。"
+---
+
+这篇笔记基于《Claude Code 最佳实践手册 v1.0.0》对应章节整理，保留原章节的核心结构，方便按主题快速复习与发布。
+
+## 本节重点
+
+- 这一节围绕主题建立完整认知框架。
+- 优先保留能直接迁移到日常工作中的方法。
+- 把概念、流程和实践建议整理成可复用笔记。
+
+## 笔记整理
+
+<p>Model Context Protocol（MCP）是 Claude Code 连接外部服务的标准协议。通过 MCP，Claude 可 以直接操作 GitHub、Notion、数据库、内部 API 等几乎任何系统，将 AI 能力深度嵌入企业工具链。</p>
+
+<p>MCP 架构概览 MCP 服务器是独立进程或远端服务，向 Claude Code 暴露一组可调用的&quot;工具&quot;（Tool）。Claude 通过 MCP 工 具与外部系统交互，工具命名格式为 mcp__&lt;服务器名&gt;__&lt;工具名&gt;。</p>
+
+<p>MCP 协议层 Claude Code → JSON-RPC 2.0 → GitHub / Notion / DB… → 外部服务 API 三种传输方式 方式一：HTTP 远程服务器（推荐） 连接云端或自托管的 MCP 服务，无需在本地安装任何依赖，最简单可靠。</p>
+
+<p># 基本语法 # 示例：连接 Notion 官方 MCP # 带认证头（Bearer Token） # 带多个自定义头 方式二：本地 stdio 服务器 在本地启动 MCP 进程，通过 stdin/stdout 通信。适合本地工具、数据库连接或需要访问本地文件的场景。</p>
+
+<p># 基本语法（-- 后为进程命令） # 示例：Airtable（通过 npx 安装并运行） # 示例：本地 Python MCP 服务器 # 示例：带参数的本地工具 方式三：SSE 服务器（遗留方式） # SSE 已废弃，优先迁移到 HTTP transport # 仅在服务端不支持 HTTP 时使用 注意 SSE（Server-Sent Events）传输方式已废弃，新部署的 MCP 服务应使用 HTTP transport。若你的服务提供 商仍在使用 SSE，建议催促其升级。</p>
+
+<p>三个作用域（Scope） MCP 服务器的可用范围由 --scope 参数控制，对应不同的存储位置和可见性：</p>
+
+<p>作用域 | 命令参数 | 存储位置 | 可见性</p>
+
+<pre><code>local（默认）
+省略或 --scope local
+~/.claude.json
+仅当前项目，个人私有</code></pre>
+
+<p>project --scope project .mcp.json （项目根目录） 团队所有成员，可提交 git</p>
+
+<pre><code>user
+--scope user
+~/.claude.json
+个人全局，跨所有项目</code></pre>
+
+<p># local 作用域（默认）：当前项目可用，私有 # project 作用域：团队共享，写入 .mcp.json 可提交 git # user 作用域：个人全局，在所有项目中都可用 .mcp.json 格式详解 .mcp.json 是项目级 MCP 配置文件，提交到 git 后团队所有成员自动获得相同的 MCP 服务器配置：</p>
+
+<p>{ } }, } }, } } } } 环境变量展开语法：</p>
+
+<p>语法 | 含义 | 示例</p>
+
+<p>${VAR} 展开为环境变量 VAR 的值 ${GITHUB_TOKEN} ${VAR:-default} VAR 未设置时使用默认值 ${DB_URL:-localhost:5432} ${CLAUDE_PROJECT_DIR} 当前项目根目录路径自动由 Claude Code 注入 核心建议</p>
+
+<pre><code>将 API 密钥通过 ${TOKEN} 引用，不要硬编码在 .mcp.json 中。提交到 git 的文件只包含环境变量名，实际</code></pre>
+
+<p>密钥由每个开发者在本地设置。</p>
+
+<p>MCP 管理命令速查 # 列出所有已配置的 MCP 服务器 # 查看特定服务器详情（连接状态、工具列表） # 删除服务器配置 # 重置项目服务器的手动审批记录（重新弹出授权确认） # 在会话内查看 MCP 状态和认证信息 MCP 相关环境变量 # 设置 MCP 服务器连接超时（毫秒，默认无限制） # 增加 MCP 工具输出 token 上限（默认 10000） # 启动时自动批准项目 .mcp.json 中的所有服务器（跳过手动确认） 在 Hooks 中拦截 MCP 工具调用 MCP 工具同样会触发 PreToolUse / PostToolUse hook，工具名格式为 mcp__&lt;服务器名&gt;__&lt;工具名&gt;：</p>
+
+<p>{ { { } ] } ] } } # 记录所有 GitHub 写操作 # 阻止向 main/master 分支直接推送 permissionDecisionReason: &quot;禁止直接推送到 main/master 分支，请使用 Pull Request 工作流&quot; } }&#x27; settings.json 中自动批准 MCP 服务器 默认情况下，首次使用项目 .mcp.json 中的服务器时，Claude Code 会弹出确认对话框。可在 settings.json 中配置自动批准：</p>
+
+<p>{ } 注意 仅在完全信任项目 .mcp.json 内容时才设置 enableAllProjectMcpServers: true。若项目仓库被第三方 修改 .mcp.json，可能引入恶意 MCP 服务器。建议仅在受信任的私有仓库中使用此选项。</p>
+
+<p>MCP + Hooks 协同的完整工作流 将 MCP 与 Hooks 结合，可以构建强大的自动化工作流。以&quot;自动化代码审查提交&quot;为例：</p>
+
+<p>1 | Claude 使用 MCP GitHub 工具创建 PR</p>
+
+<p>触发 PreToolUse hook，验证目标分支不是 main，PR 描述是否完整。</p>
+
+<p>2 | PR 创建成功后，PostToolUse hook 自动触发</p>
+
+<p>调用 CI 接口启动自动化测试，将 PR URL 发送到团队 Slack 频道。</p>
+
+<p>3 | Claude 宣布完成时，Stop hook 介入验证</p>
+
+<p>检查 CI 状态：若测试未完成，阻止 Claude 停止并等待；若测试失败，要求 Claude 修复。</p>
+
+<p>4 | 所有验证通过，Notification hook 推送桌面通知</p>
+
+<p>&quot;PR #42 已创建，CI 全绿，等待 Code Review&quot;——开发者可以放心切换到其他任务。</p>
+
+<p>架构原则：Hooks 是&quot;护栏&quot;，MCP 是&quot;能力扩展&quot;。两者结合的正确姿势是：用 MCP 扩大 Claude 能触达的系 统范围，用 Hooks 确保每一次 MCP 工具调用都在可控的边界内执行。不要在 MCP 服务端做权限控制，让 Hooks 统一承担这个职责——这样权限策略对所有工具（内置 + MCP）一视同仁。</p>

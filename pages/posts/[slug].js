@@ -1,7 +1,7 @@
 import { getGlobalData } from '../../utils/global-data';
 import {
   getPostBySlug,
-  getPostFilePaths,
+  getPosts,
 } from '../../utils/mdx-utils';
 
 import { startTransition, useEffect, useRef, useState } from 'react';
@@ -124,7 +124,7 @@ export default function PostPage({
           <button
             type="button"
             onClick={goBackToTimeline}
-            className="rounded-full border border-white/50 bg-white/72 px-4 py-2 text-xs tracking-[0.24em] uppercase shadow-[0_14px_36px_rgba(230,198,166,0.2)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/30 dark:hover:bg-black/40"
+            className="rounded-full border border-white/50 bg-white/[0.76] px-4 py-2 text-xs tracking-[0.24em] uppercase shadow-[0_14px_36px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/30 dark:hover:bg-black/40"
           >
             Back to timeline
           </button>
@@ -137,8 +137,7 @@ export default function PostPage({
               : 'pointer-events-none translate-x-10 scale-95 opacity-0'
           }`}
         >
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/45 bg-white/26 p-4 shadow-[0_18px_60px_rgba(230,198,166,0.24)] backdrop-blur-[24px] dark:border-white/10 dark:bg-white/8 dark:shadow-[0_18px_56px_rgba(0,0,0,0.28)]">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08))] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
+          <div className="glass-panel rounded-[2rem] p-4">
             <div className="relative">
               {frontMatter.cover && (
                 <div className="mb-4 overflow-hidden rounded-[1.35rem] border border-white/35 bg-white/35 dark:border-white/10 dark:bg-white/5">
@@ -150,7 +149,7 @@ export default function PostPage({
                 </div>
               )}
               {frontMatter.date && (
-                <p className="text-[11px] font-semibold tracking-[0.24em] uppercase opacity-55">
+                <p className="section-kicker !text-[10px] !opacity-60">
                   {formatDisplayDateTime(frontMatter.date)}
                 </p>
               )}
@@ -168,7 +167,7 @@ export default function PostPage({
                     <Link
                       key={`${frontMatter.slug}-dock-${tag}`}
                       href={`/tags/${tagToSlug(tag)}`}
-                      className="rounded-full bg-black/5 px-3 py-1 text-[11px] tracking-[0.18em] uppercase dark:bg-white/10"
+                      className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[11px] tracking-[0.18em] uppercase dark:border-white/10 dark:bg-white/10"
                     >
                       {tag}
                     </Link>
@@ -182,8 +181,8 @@ export default function PostPage({
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/8 dark:bg-white/10">
                   <div
-                    className="h-full rounded-full bg-primary transition-[width] duration-300"
-                    style={{ width: `${readProgress}%` }}
+                    className="h-full origin-left rounded-full bg-primary transition-transform duration-300"
+                    style={{ transform: `scaleX(${readProgress / 100})` }}
                   />
                 </div>
               </div>
@@ -191,14 +190,14 @@ export default function PostPage({
                 <button
                   type="button"
                   onClick={scrollToTop}
-                  className="inline-flex rounded-full border border-white/55 bg-white/68 px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(230,198,166,0.18)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
+                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
                 >
                   Back to top
                 </button>
                 <button
                   type="button"
                   onClick={goBackToTimeline}
-                  className="inline-flex rounded-full border border-white/55 bg-white/68 px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(230,198,166,0.18)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
+                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
                 >
                   Back to timeline
                 </button>
@@ -208,9 +207,9 @@ export default function PostPage({
         </aside>
       </div>
       <article className="w-full max-w-4xl px-2 mx-auto md:px-0">
-        <header ref={heroHeaderRef}>
+        <header ref={heroHeaderRef} className="animate-fade-up">
           {frontMatter.cover && (
-            <div className="mb-8 overflow-hidden border border-black/10 rounded-[2rem] bg-white/60 dark:border-white/10 dark:bg-white/5">
+            <div className="glass-panel mb-8 overflow-hidden rounded-[2rem]">
               <img
                 src={frontMatter.cover}
                 alt={frontMatter.title}
@@ -219,15 +218,15 @@ export default function PostPage({
             </div>
           )}
           {frontMatter.date && (
-            <p className="mb-3 text-sm font-semibold tracking-[0.22em] uppercase text-center opacity-60">
+            <p className="section-kicker mx-auto mb-4 w-fit !text-[11px] !opacity-64">
               {formatDisplayDateTime(frontMatter.date)}
             </p>
           )}
-          <h1 className="mb-6 text-3xl text-center md:text-5xl dark:text-white">
+          <h1 className="mb-6 text-center text-4xl md:text-6xl dark:text-white">
             {frontMatter.title}
           </h1>
           {frontMatter.summary && (
-            <p className="max-w-2xl mx-auto mb-6 text-lg text-center opacity-75">
+            <p className="mx-auto mb-6 max-w-2xl text-center text-lg leading-8 opacity-75">
               {frontMatter.summary}
             </p>
           )}
@@ -237,7 +236,7 @@ export default function PostPage({
                 <Link
                   key={`${frontMatter.slug}-${tag}`}
                   href={`/tags/${tagToSlug(tag)}`}
-                  className="px-3 py-1 text-xs tracking-[0.18em] uppercase rounded-full bg-black/5 dark:bg-white/10"
+                  className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs tracking-[0.18em] uppercase dark:border-white/10 dark:bg-white/10"
                 >
                   {tag}
                 </Link>
@@ -245,7 +244,7 @@ export default function PostPage({
             </div>
           )}
         </header>
-        <main>
+        <main className="glass-panel animate-fade-up rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
           <article
             className="prose prose-neutral max-w-none dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: html }}
@@ -255,11 +254,11 @@ export default function PostPage({
       <Footer copyrightText={globalData.footerText} />
       <GradientBackground
         variant="large"
-        className="absolute -top-32 opacity-30 dark:opacity-50"
+        className="absolute -top-32 opacity-[0.32] dark:opacity-[0.48]"
       />
       <GradientBackground
         variant="small"
-        className="absolute bottom-0 opacity-20 dark:opacity-10"
+        className="absolute bottom-0 opacity-[0.18] dark:opacity-[0.12]"
       />
     </Layout>
   );
@@ -279,9 +278,9 @@ export const getStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths = async () => {
-  const paths = getPostFilePaths()
-    .map((filePath) => filePath.replace(/\.mdx?$/, ''))
-    .map((slug) => ({ params: { slug } }));
+  const paths = getPosts().map((post) => ({
+    params: { slug: post.slug },
+  }));
 
   return {
     paths,
