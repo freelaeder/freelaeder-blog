@@ -67,22 +67,6 @@ export default function Index({ posts, globalData }) {
   const activePost = postMap.get(activeSlug);
   const activeYear = activePost ? getDateParts(activePost.data.date).year : '';
 
-  const isTimelineRailVisible = () => {
-    const timelineRail = document.getElementById('timeline-rail');
-
-    if (!timelineRail) {
-      return false;
-    }
-
-    const timelineRailStyles = window.getComputedStyle(timelineRail);
-
-    return (
-      timelineRailStyles.display !== 'none' &&
-      timelineRailStyles.visibility !== 'hidden' &&
-      timelineRail.offsetParent !== null
-    );
-  };
-
   const getTimelineScrollTopForSlug = (slug) => {
     const timelineRail = document.getElementById('timeline-rail');
     const timelineItem = document.getElementById(`timeline-${slug}`);
@@ -164,35 +148,20 @@ export default function Index({ posts, globalData }) {
     saveHomeTimelineState({ activeSlug: slug });
   };
 
-  useEffect(() => {
+  const syncHeaderCompactState = (nextState = {}) => {
+    const timelineRail = document.getElementById('timeline-rail');
     const scrollContainer = document.getElementById('page-scroll-container');
-    if (!scrollContainer) {
-      return undefined;
-    }
+    const contentScrollTop =
+      nextState.contentScrollTop ?? scrollContainer?.scrollTop ?? 0;
+    const timelineScrollTop =
+      nextState.timelineScrollTop ?? timelineRail?.scrollTop ?? 0;
 
-    const preventDirectScroll = (event) => {
-      if (!isTimelineRailVisible()) {
-        return;
-      }
-
-      if (event.target.closest('#timeline-rail')) {
-        return;
-      }
-
-      event.preventDefault();
-    };
-    scrollContainer.addEventListener('wheel', preventDirectScroll, {
-      passive: false,
-    });
-    scrollContainer.addEventListener('touchmove', preventDirectScroll, {
-      passive: false,
-    });
-
-    return () => {
-      scrollContainer.removeEventListener('wheel', preventDirectScroll);
-      scrollContainer.removeEventListener('touchmove', preventDirectScroll);
-    };
-  }, [posts]);
+    window.dispatchEvent(
+      new CustomEvent('header-compact-state', {
+        detail: { isScrolled: contentScrollTop > 48 || timelineScrollTop > 48 },
+      })
+    );
+  };
 
   useEffect(() => {
     const restoreHomeTimelineState = () => {
@@ -261,11 +230,7 @@ export default function Index({ posts, globalData }) {
         });
 
         setIsTimelineScrolled(timelineScrollTop > 48);
-        window.dispatchEvent(
-          new CustomEvent('header-compact-state', {
-            detail: { isScrolled: timelineScrollTop > 48 },
-          })
-        );
+        syncHeaderCompactState({ contentScrollTop, timelineScrollTop });
       } catch {
         isRestoringTimelineRef.current = false;
         isTimelineStateReadyRef.current = true;
@@ -279,6 +244,31 @@ export default function Index({ posts, globalData }) {
         restoreHomeTimelineState();
       });
     });
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = document.getElementById('page-scroll-container');
+
+    if (!scrollContainer) {
+      return undefined;
+    }
+
+    const handleContentScroll = () => {
+      if (isTimelineStateReadyRef.current) {
+        saveHomeTimelineState({ contentScrollTop: scrollContainer.scrollTop });
+      }
+
+      syncHeaderCompactState({ contentScrollTop: scrollContainer.scrollTop });
+    };
+
+    handleContentScroll();
+    scrollContainer.addEventListener('scroll', handleContentScroll, {
+      passive: true,
+    });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleContentScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -322,30 +312,23 @@ export default function Index({ posts, globalData }) {
     }
 
     const handleTimelineScroll = () => {
-      const nextScrolledState = timelineRail.scrollTop > 48;
+      const timelineScrollTop = timelineRail.scrollTop;
+      const nextScrolledState = timelineScrollTop > 48;
       setIsTimelineScrolled(nextScrolledState);
 
       if (isTimelineStateReadyRef.current) {
-        saveHomeTimelineState({ timelineScrollTop: timelineRail.scrollTop });
+        saveHomeTimelineState({ timelineScrollTop });
       }
 
-      window.dispatchEvent(
-        new CustomEvent('header-compact-state', {
-          detail: { isScrolled: nextScrolledState },
-        })
-      );
+      syncHeaderCompactState({ timelineScrollTop });
     };
 
+    handleTimelineScroll();
     timelineRail.addEventListener('scroll', handleTimelineScroll, {
       passive: true,
     });
 
     return () => {
-      window.dispatchEvent(
-        new CustomEvent('header-compact-state', {
-          detail: { isScrolled: false },
-        })
-      );
       timelineRail.removeEventListener('scroll', handleTimelineScroll);
     };
   }, []);
@@ -354,7 +337,7 @@ export default function Index({ posts, globalData }) {
     <Layout>
       <SEO title={globalData.name} description={globalData.blogDescription} />
       <Header name={globalData.name} />
-      <main className="grid items-start gap-14 pt-6 lg:grid-cols-[minmax(240px,0.92fr)_minmax(0,1.5fr)] lg:gap-16 xl:grid-cols-[minmax(240px,0.92fr)_minmax(0,1.5fr)_minmax(270px,0.82fr)] xl:gap-20">
+      <main className="grid items-start gap-14 pt-6 lg:grid-cols-[minmax(240px,0.92fr)_minmax(0,1.5fr)] lg:gap-16 xl:grid-cols-[minmax(240px,0.88fr)_minmax(0,1.34fr)_minmax(360px,0.98fr)] xl:gap-14">
         <aside className="lg:sticky lg:top-24">
           <div className="relative overflow-hidden rounded-[2rem] border border-white/45 bg-white/30 px-7 py-8 shadow-[0_18px_70px_rgba(230,198,168,0.18)] backdrop-blur-[24px] dark:border-white/10 dark:bg-white/6 dark:shadow-[0_22px_70px_rgba(0,0,0,0.24)]">
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08))] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
@@ -503,10 +486,13 @@ export default function Index({ posts, globalData }) {
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.08))] dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))]" />
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[rgba(252,248,244,0.95)] via-[rgba(252,248,244,0.74)] to-transparent dark:from-[rgba(16,18,24,0.96)] dark:via-[rgba(16,18,24,0.72)] dark:to-transparent" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-18 bg-gradient-to-t from-[rgba(252,248,244,0.95)] via-[rgba(252,248,244,0.74)] to-transparent dark:from-[rgba(16,18,24,0.96)] dark:via-[rgba(16,18,24,0.72)] dark:to-transparent" />
-            <div className="pointer-events-none absolute inset-y-6 left-6 w-px bg-white/35 dark:bg-white/8" />
+            <div className="pointer-events-none absolute inset-y-6 left-1/2 z-[1] w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(223,135,98,0.28),rgba(223,135,98,0.16),rgba(223,135,98,0.06))] dark:bg-[linear-gradient(180deg,rgba(241,147,105,0.34),rgba(241,147,105,0.16),rgba(255,255,255,0.06))]" />
             <div className="timeline-bob pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/62 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] opacity-75 shadow-[0_10px_26px_rgba(236,210,182,0.28)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.22)]">
               <span className="block h-4 w-px bg-black/20 dark:bg-white/24" />
               Scroll
+            </div>
+            <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-white/50 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] opacity-78 shadow-[0_10px_24px_rgba(236,210,182,0.18)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.16)]">
+              Tree Archive
             </div>
             <button
               type="button"
@@ -531,84 +517,104 @@ export default function Index({ posts, globalData }) {
             </button>
             <div
               id="timeline-rail"
-              className="max-h-[calc(100vh-8rem)] space-y-8 overflow-y-auto overscroll-contain px-5 pr-4 pt-14 pb-12"
+              className="max-h-[calc(100vh-8rem)] space-y-10 overflow-y-auto overscroll-contain px-4 pt-16 pb-12"
             >
             {yearGroups.map(([year, yearPosts]) => (
-              <section key={year} className="relative pl-6">
-                <div
-                  className={`absolute left-[11px] top-3 bottom-2 w-px transition-colors duration-300 ${
-                    activeYear === year
-                      ? 'bg-primary/45 dark:bg-primary/55'
-                      : 'bg-black/10 dark:bg-white/10'
-                  }`}
-                />
-                <div className="relative">
+              <section key={year} className="relative">
+                <div className="relative mx-auto flex w-fit items-center justify-center px-4">
                   <span
-                    className={`absolute left-[-20px] top-[7px] h-2.5 w-2.5 rounded-full border transition-all duration-300 ${
+                    className={`absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 ${
                       activeYear === year
-                        ? 'scale-125 border-primary/50 bg-primary/55'
-                        : 'border-black/15 bg-[rgba(248,244,238,0.95)] dark:border-white/20 dark:bg-[#0f1318]'
+                        ? 'scale-110 border-primary/45 bg-primary/55 shadow-[0_0_0_6px_rgba(223,135,98,0.12)]'
+                        : 'border-black/12 bg-[rgba(248,244,238,0.96)] dark:border-white/16 dark:bg-[#0f1318]'
                     }`}
                   />
                   <h3
-                    className={`text-xs font-semibold tracking-[0.34em] uppercase transition-colors duration-300 ${
-                      activeYear === year ? 'text-primary opacity-100' : 'opacity-55'
+                    className={`relative rounded-full border px-4 py-1 text-[10px] font-semibold tracking-[0.36em] uppercase transition-all duration-300 ${
+                      activeYear === year
+                        ? 'border-primary/28 bg-primary/10 text-primary shadow-[0_10px_24px_rgba(223,135,98,0.12)]'
+                        : 'border-black/8 bg-white/50 opacity-72 dark:border-white/10 dark:bg-white/8'
                     }`}
                   >
                     {year}
                   </h3>
                 </div>
 
-                <div className="mt-4 space-y-3">
-                  {yearPosts.map((post, index) => (
-                    <a
-                      key={`timeline-${post.slug}`}
-                      id={`timeline-${post.slug}`}
-                      href={`#post-${post.slug}`}
-                      style={{ marginLeft: `${(index % 3) * 8}px` }}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setActiveSlug(post.slug);
-                        scrollToPost(post.slug);
-                      }}
-                      className={`group relative block pl-10 pr-2 transition-all duration-300 ${
-                        activeSlug === post.slug ? 'translate-x-1' : ''
-                      }`}
-                    >
-                      <span
-                        className={`absolute left-0 top-[15px] h-px w-6 transition-colors duration-300 ${
-                          activeSlug === post.slug
-                            ? 'bg-primary/45 dark:bg-primary/55'
-                            : 'bg-black/12 dark:bg-white/12'
-                        }`}
-                      />
-                      <span
-                        className={`absolute left-[22px] top-[11px] h-2 w-2 rounded-full border transition-all duration-300 group-hover:scale-125 ${
-                          activeSlug === post.slug
-                            ? 'scale-125 border-primary/45 bg-primary/60'
-                            : 'border-black/12 bg-[rgba(248,244,238,0.92)] dark:border-white/20 dark:bg-[#10141a]'
-                        }`}
-                      />
-                      <p
-                        className={`text-[10px] font-semibold tracking-[0.28em] uppercase transition-colors duration-300 ${
-                          activeSlug === post.slug
-                            ? 'text-primary opacity-90'
-                            : 'opacity-42'
+                <div className="mt-5 space-y-4">
+                  {yearPosts.map((post, index) => {
+                    const isLeftBranch = index % 2 === 0;
+                    const timeLabel = getDateParts(post.data.date).time || '00:00';
+
+                    return (
+                      <a
+                        key={`timeline-${post.slug}`}
+                        id={`timeline-${post.slug}`}
+                        href={`#post-${post.slug}`}
+                        aria-current={activeSlug === post.slug ? 'true' : undefined}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          setActiveSlug(post.slug);
+                          scrollToPost(post.slug);
+                        }}
+                        className={`group relative block min-h-[84px] transition-all duration-300 ${
+                          activeSlug === post.slug ? 'z-10' : 'z-[1]'
                         }`}
                       >
-                        {formatTimelineDate(post.data.date)}
-                      </p>
-                      <p
-                        className={`mt-1 text-sm leading-6 transition-all duration-300 line-clamp-1 ${
-                          activeSlug === post.slug
-                            ? 'font-medium text-primary opacity-100'
-                            : 'opacity-68 group-hover:opacity-100'
-                        }`}
-                      >
-                        {post.data.title}
-                      </p>
-                    </a>
-                  ))}
+                        <span
+                          className={`absolute left-1/2 top-[42px] h-px w-8 -translate-y-1/2 transition-colors duration-300 ${
+                            isLeftBranch ? '-translate-x-full' : ''
+                          } ${
+                            activeSlug === post.slug
+                              ? 'bg-primary/50 dark:bg-primary/58'
+                              : 'bg-black/10 dark:bg-white/12'
+                          }`}
+                        />
+                        <span
+                          className={`absolute left-1/2 top-[42px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 group-hover:scale-110 ${
+                            activeSlug === post.slug
+                              ? 'border-primary/45 bg-primary/60 shadow-[0_0_0_5px_rgba(223,135,98,0.12)]'
+                              : 'border-black/12 bg-[rgba(248,244,238,0.96)] dark:border-white/20 dark:bg-[#10141a]'
+                          }`}
+                        />
+                        <div
+                          className={`w-[calc(50%-1.3rem)] ${
+                            isLeftBranch
+                              ? 'pr-6 text-right'
+                              : 'ml-auto pl-6 text-left'
+                          }`}
+                        >
+                          <div
+                            className={`rounded-[1.2rem] border px-4 py-3 transition-all duration-300 ${
+                              activeSlug === post.slug
+                                ? 'border-primary/28 bg-white/72 shadow-[0_16px_30px_rgba(223,135,98,0.16)] dark:border-primary/24 dark:bg-white/12'
+                                : 'border-white/45 bg-white/42 hover:bg-white/60 dark:border-white/8 dark:bg-white/6 dark:hover:bg-white/10'
+                            }`}
+                          >
+                            <p
+                              className={`text-[10px] font-semibold tracking-[0.28em] uppercase transition-colors duration-300 ${
+                                activeSlug === post.slug
+                                  ? 'text-primary opacity-92'
+                                  : 'opacity-46'
+                              }`}
+                            >
+                              {formatTimelineDate(post.data.date)}
+                              <span className="mx-1.5 opacity-28">/</span>
+                              {timeLabel}
+                            </p>
+                            <p
+                              className={`mt-2 text-[13px] leading-5 transition-all duration-300 line-clamp-2 ${
+                                activeSlug === post.slug
+                                  ? 'font-medium text-primary opacity-100'
+                                  : 'opacity-74 group-hover:opacity-100'
+                              }`}
+                            >
+                              {post.data.title}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               </section>
             ))}
