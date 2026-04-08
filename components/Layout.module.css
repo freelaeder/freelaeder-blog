@@ -25,31 +25,31 @@
   transform: translateX(-50%);
   background: radial-gradient(
       at 18% 22%,
-      color-mix(in srgb, var(--color-gradient-1) 84%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-1) 66%, transparent) 0,
       transparent 24%
     ),
     radial-gradient(
       at 72% 18%,
-      color-mix(in srgb, var(--color-gradient-2) 74%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-2) 42%, transparent) 0,
       transparent 28%
     ),
     radial-gradient(
       at 44% 68%,
-      color-mix(in srgb, var(--color-gradient-3) 54%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-3) 34%, transparent) 0,
       transparent 34%
     ),
     radial-gradient(
       at 88% 72%,
-      color-mix(in srgb, var(--color-gradient-4) 70%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-4) 42%, transparent) 0,
       transparent 26%
     );
-  max-height: 920px;
-  height: 82vh;
-  max-width: 1480px;
+  max-height: 860px;
+  height: 76vh;
+  max-width: 1320px;
   width: 100%;
-  filter: blur(72px);
-  opacity: 0.9;
-  animation: gradientDrift 22s ease-in-out infinite;
+  filter: blur(88px);
+  opacity: 0.54;
+  animation: gradientDrift 24s ease-in-out infinite;
   z-index: -1;
 }
 
@@ -58,29 +58,29 @@
   transform: translateX(-50%) rotate(188deg);
   background: radial-gradient(
       at 22% 18%,
-      color-mix(in srgb, var(--color-gradient-1) 64%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-1) 42%, transparent) 0,
       transparent 26%
     ),
     radial-gradient(
       at 76% 24%,
-      color-mix(in srgb, var(--color-gradient-2) 54%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-2) 34%, transparent) 0,
       transparent 30%
     ),
     radial-gradient(
       at 44% 62%,
-      color-mix(in srgb, var(--color-gradient-3) 42%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-3) 26%, transparent) 0,
       transparent 38%
     ),
     radial-gradient(
       at 84% 74%,
-      color-mix(in srgb, var(--color-gradient-4) 58%, transparent) 0,
+      color-mix(in srgb, var(--color-gradient-4) 32%, transparent) 0,
       transparent 34%
     );
-  height: 680px;
-  max-width: 1120px;
+  height: 560px;
+  max-width: 980px;
   width: 100%;
-  filter: blur(68px);
-  opacity: 0.7;
-  animation: gradientDriftReverse 26s ease-in-out infinite;
+  filter: blur(72px);
+  opacity: 0.34;
+  animation: gradientDriftReverse 28s ease-in-out infinite;
   z-index: -1;
 }

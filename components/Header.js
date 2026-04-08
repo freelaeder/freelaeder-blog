@@ -42,12 +42,12 @@ function ThemeSwitcher({ theme, onThemeChange }) {
   const getButtonClassName = (targetTheme) =>
     `flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
       theme === targetTheme
-        ? 'bg-[linear-gradient(135deg,rgba(77,141,255,0.92),rgba(122,243,213,0.92))] text-slate-950 shadow-[0_16px_32px_rgba(77,141,255,0.28)]'
+        ? 'bg-black text-white shadow-[0_12px_28px_rgba(29,27,24,0.16)] dark:bg-white dark:text-slate-950'
         : 'text-slate-700/68 hover:bg-black/5 hover:text-slate-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white'
     }`;
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-black/10 bg-white/[0.54] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-md dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+    <div className="flex items-center gap-1 rounded-full border border-black/8 bg-white/[0.55] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-md dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       <button
         type="button"
         aria-label="Use Light Mode"
@@ -130,8 +130,8 @@ export default function Header({ name }) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full py-4">
-      <div className="relative h-[72px]">
+    <header className="sticky top-0 z-40 w-full py-3 md:py-4">
+      <div className="relative h-[68px] md:h-[72px]">
         <div
           className={`absolute inset-0 transition-all duration-300 ${
             isCompact
@@ -139,28 +139,28 @@ export default function Header({ name }) {
               : 'translate-y-0 scale-100 opacity-100'
           }`}
         >
-          <div className="glass-panel flex items-center justify-between rounded-[2rem] px-4 py-3">
+          <div className="glass-panel flex items-center justify-between rounded-[1.6rem] px-3 py-3 sm:px-4 md:rounded-[2rem] md:px-5">
             <Link
               href="/"
-              className="flex items-center gap-3 text-sm font-semibold tracking-[0.24em] uppercase dark:text-white"
+              className="flex min-w-0 items-center gap-2.5 text-[11px] font-semibold tracking-[0.22em] uppercase dark:text-white sm:gap-3 sm:text-sm"
             >
-              <span className="pulse-glow block h-3 w-3 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-3))]" />
-              {name}
+              <span className="pulse-glow block h-2.5 w-2.5 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-2))] sm:h-3 sm:w-3" />
+              <span className="truncate">{name}</span>
               <span className="tech-pill hidden px-3 py-1 md:inline-flex">
                 Archive
               </span>
             </Link>
-            <div className="flex items-center gap-2">
-              <nav className="flex items-center gap-1 text-[11px] uppercase tracking-[0.28em] opacity-72 md:text-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <nav className="flex items-center gap-1 text-[10px] uppercase tracking-[0.22em] opacity-72 sm:text-[11px]">
                 <Link
                   href="/"
-                  className="rounded-full px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10"
+                  className="rounded-full px-2.5 py-2 hover:bg-black/5 dark:hover:bg-white/10 sm:px-3"
                 >
                   Home
                 </Link>
                 <Link
                   href="/tags"
-                  className="rounded-full px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10"
+                  className="rounded-full px-2.5 py-2 hover:bg-black/5 dark:hover:bg-white/10 sm:px-3"
                 >
                   Tags
                 </Link>
@@ -177,8 +177,8 @@ export default function Header({ name }) {
               : 'pointer-events-none translate-x-14 translate-y-3 scale-75 opacity-0'
           }`}
         >
-          <div className="glass-panel flex h-14 w-14 items-center justify-center rounded-full">
-            <span className="pulse-glow block h-3.5 w-3.5 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-2))]" />
+          <div className="glass-panel flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full md:h-14 md:w-14">
+            <span className="pulse-glow block h-3 w-3 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-2))] md:h-3.5 md:w-3.5" />
           </div>
         </div>
       </div>

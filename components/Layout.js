@@ -58,6 +58,13 @@ export default function Layout({ children, contentClassName = '' }) {
       return undefined;
     }
 
+    if (!window.matchMedia('(pointer: fine)').matches) {
+      backgroundElement.style.setProperty('--pointer-x', '50%');
+      backgroundElement.style.setProperty('--pointer-y', '28%');
+      backgroundElement.style.setProperty('--pointer-glow-opacity', '0');
+      return undefined;
+    }
+
     let frameId = 0;
     let currentX = 50;
     let currentY = 28;
@@ -139,10 +146,10 @@ export default function Layout({ children, contentClassName = '' }) {
           <div className="site-interaction" />
           <div className="site-glow" />
         </div>
-        <div className="absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(77,141,255,0.32),transparent)] md:inset-x-10" />
+        <div className="absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(157,100,72,0.2),transparent)] md:inset-x-10" />
       </div>
       <div
-        className={`relative z-10 mx-auto flex min-h-full w-full max-w-[1520px] flex-col px-4 pb-24 md:px-8 lg:px-10 ${contentClassName}`}
+        className={`relative z-10 mx-auto flex min-h-full w-full max-w-[1380px] flex-col px-4 pb-[4.5rem] md:px-8 md:pb-[5.5rem] lg:px-10 lg:pb-24 ${contentClassName}`}
       >
         {children}
       </div>

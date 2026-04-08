@@ -332,19 +332,19 @@ export default function Index({ posts, globalData }) {
     <Layout>
       <SEO title={globalData.name} description={globalData.blogDescription} />
       <Header name={globalData.name} />
-      <main className="grid items-start gap-10 pt-4 lg:grid-cols-[minmax(280px,0.94fr)_minmax(0,1.5fr)] lg:gap-12 xl:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.38fr)_minmax(360px,0.98fr)] xl:gap-12">
+      <main className="grid items-start gap-7 pt-3 sm:gap-8 sm:pt-4 lg:grid-cols-[minmax(240px,0.92fr)_minmax(0,1.42fr)] lg:gap-10 xl:grid-cols-[minmax(250px,0.82fr)_minmax(0,1.3fr)_minmax(360px,0.98fr)] xl:gap-10 2xl:grid-cols-[minmax(250px,0.8fr)_minmax(0,1.28fr)_minmax(380px,1fr)] 2xl:gap-12">
         <aside className="lg:sticky lg:top-20">
-          <div className="glass-panel rounded-[2rem] px-7 py-8">
+          <div className="glass-panel rounded-[1.75rem] px-5 py-6 sm:px-7 sm:py-8 md:rounded-[2rem]">
             <div className="relative">
               <p className="section-kicker">Personal archive</p>
-              <h1 className="mt-5 max-w-sm text-[3rem] leading-[0.92] md:text-[3.7rem] lg:text-[4.1rem]">
+              <h1 className="mt-4 max-w-sm text-[2.35rem] leading-[0.98] sm:mt-5 sm:text-[3rem] md:text-[3.4rem] lg:text-[3.8rem]">
                 {globalData.blogTitle}
               </h1>
-              <p className="mt-6 max-w-sm text-base leading-8 opacity-70 md:text-lg">
+              <p className="mt-5 max-w-md text-[15px] leading-7 opacity-72 sm:text-base sm:leading-8 md:text-lg">
                 {globalData.blogDescription}
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-7 flex flex-wrap items-center gap-2.5 sm:mt-8 sm:gap-3">
                 <span className="tech-pill">
                   <span className="pulse-glow h-2 w-2 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-3))]" />
                   Quiet signal
@@ -354,7 +354,7 @@ export default function Index({ posts, globalData }) {
                 </Link>
               </div>
 
-              <div className="mt-10 grid grid-cols-2 gap-4">
+              <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-4">
                 <div className="stat-tile">
                   <p className="text-[11px] tracking-[0.3em] uppercase opacity-45">
                     Articles
@@ -371,7 +371,7 @@ export default function Index({ posts, globalData }) {
                 </div>
               </div>
 
-              <div className="mt-8 rounded-[1.4rem] border border-black/10 bg-white/[0.38] px-4 py-4 text-sm leading-7 opacity-72 dark:border-white/10 dark:bg-white/[0.03]">
+              <div className="mt-6 rounded-[1.2rem] border border-black/8 bg-white/[0.4] px-4 py-3.5 text-sm leading-7 opacity-72 dark:border-white/10 dark:bg-white/[0.03] sm:mt-8 sm:rounded-[1.35rem] sm:py-4">
                 <p>
                   {formatDisplayDate(latestPost.data.date)} to{' '}
                   {formatDisplayDate(oldestPost.data.date)}
@@ -382,7 +382,7 @@ export default function Index({ posts, globalData }) {
         </aside>
 
         <section className="w-full min-w-0 lg:px-2 xl:px-4">
-          <ol className="space-y-4">
+          <ol className="space-y-3 sm:space-y-4">
             {posts.map((post, index) => {
               const { year } = getDateParts(post.data.date);
               const previousYear =
@@ -392,10 +392,10 @@ export default function Index({ posts, globalData }) {
               return (
                 <Fragment key={post.slug}>
                   {showYearMarker && (
-                    <li className="pt-8 first:pt-0">
-                      <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-4 dark:border-white/10">
+                    <li className="pt-6 first:pt-0 sm:pt-8">
+                      <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-3.5 dark:border-white/10 sm:pb-4">
                         <span className="section-kicker">Year</span>
-                        <h3 className="text-2xl md:text-3xl">{year}</h3>
+                        <h3 className="text-[1.7rem] sm:text-2xl md:text-3xl">{year}</h3>
                       </div>
                     </li>
                   )}
@@ -405,8 +405,8 @@ export default function Index({ posts, globalData }) {
                     style={{ animationDelay: `${Math.min(index * 45, 420)}ms` }}
                     className={`story-card animate-fade-up scroll-mt-28 rounded-[1.85rem] border transition-all duration-300 ${
                       activeSlug === post.slug
-                        ? 'border-primary/[0.26] bg-white/70 px-5 shadow-[0_30px_70px_-38px_rgba(77,141,255,0.34)] backdrop-blur-[20px] dark:border-primary/20 dark:bg-[rgba(10,18,30,0.74)] dark:shadow-[0_30px_70px_-34px_rgba(2,6,23,0.72)]'
-                        : 'border-black/10 bg-white/[0.28] px-5 backdrop-blur-[18px] hover:border-primary/[0.18] hover:bg-white/[0.44] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]'
+                        ? 'border-primary/20 bg-white/[0.82] px-4 shadow-[0_24px_52px_-34px_rgba(29,27,24,0.16)] backdrop-blur-[18px] dark:border-primary/18 dark:bg-[rgba(17,19,23,0.84)] dark:shadow-[0_24px_52px_-34px_rgba(0,0,0,0.48)] sm:px-5'
+                        : 'border-black/8 bg-white/[0.56] px-4 backdrop-blur-[16px] hover:border-primary/14 hover:bg-white/[0.76] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] sm:px-5'
                     }`}
                   >
                     <Link
@@ -419,24 +419,24 @@ export default function Index({ posts, globalData }) {
                           timelineScrollTop: getTimelineScrollTopForSlug(post.slug),
                         });
                       }}
-                      className="group grid items-start gap-5 py-7 transition-colors md:grid-cols-[128px_minmax(0,1fr)_28px]"
+                      className="group grid items-start gap-4 py-5 transition-colors sm:gap-5 sm:py-6 md:grid-cols-[118px_minmax(0,1fr)_28px] md:py-7"
                     >
                       <div
-                        className={`pt-1 text-sm font-semibold tracking-[0.16em] uppercase transition-colors duration-300 ${
+                        className={`flex items-start justify-between gap-3 pt-0.5 text-sm font-semibold tracking-[0.14em] uppercase transition-colors duration-300 md:block md:pt-1 ${
                           activeSlug === post.slug
                             ? 'text-primary opacity-95'
                             : 'opacity-48'
                         }`}
                       >
                         <p>{formatTimelineDate(post.data.date)}</p>
-                        <p className="mt-1 text-[11px] tracking-[0.22em] opacity-65">
+                        <p className="text-[11px] tracking-[0.2em] opacity-65 md:mt-1">
                           {getDateParts(post.data.date).time || '00:00'}
                         </p>
                       </div>
 
                       <div className="min-w-0">
                         <h4
-                          className={`text-[1.85rem] leading-tight transition-all duration-300 group-hover:translate-x-1 md:text-[2rem] ${
+                          className={`text-[1.35rem] leading-tight transition-all duration-300 group-hover:translate-x-1 sm:text-[1.55rem] md:text-[1.9rem] ${
                             activeSlug === post.slug ? 'text-primary' : ''
                           }`}
                         >
@@ -444,7 +444,7 @@ export default function Index({ posts, globalData }) {
                         </h4>
                         {post.data.summary && (
                           <p
-                            className={`max-w-2xl mt-3 text-base leading-7 break-words line-clamp-2 ${
+                            className={`mt-2.5 max-w-2xl text-[15px] leading-6 break-words line-clamp-2 sm:mt-3 sm:text-base sm:leading-7 ${
                               activeSlug === post.slug ? 'opacity-80' : 'opacity-62'
                             }`}
                           >
@@ -452,11 +452,11 @@ export default function Index({ posts, globalData }) {
                           </p>
                         )}
                         {post.data.tags?.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-4">
+                          <div className="mt-3.5 flex flex-wrap gap-2 sm:mt-4">
                             {post.data.tags.slice(0, 3).map((tag) => (
                               <span
                                 key={`${post.slug}-${tag}`}
-                                className={`rounded-full px-3 py-1 text-[11px] tracking-[0.2em] uppercase ${
+                                className={`rounded-full px-2.5 py-1 text-[10px] tracking-[0.18em] uppercase sm:px-3 sm:text-[11px] ${
                                   activeSlug === post.slug
                                     ? 'border border-primary/15 bg-primary/10 text-primary dark:bg-primary/15'
                                     : 'border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/10'
@@ -484,14 +484,10 @@ export default function Index({ posts, globalData }) {
 
         <aside className="hidden xl:sticky xl:top-20 xl:block xl:self-start">
           <div className="glass-panel rounded-[2rem]">
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[rgba(248,251,255,0.94)] via-[rgba(248,251,255,0.76)] to-transparent dark:from-[rgba(8,14,24,0.96)] dark:via-[rgba(8,14,24,0.72)] dark:to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[4.5rem] bg-gradient-to-t from-[rgba(248,251,255,0.94)] via-[rgba(248,251,255,0.76)] to-transparent dark:from-[rgba(8,14,24,0.96)] dark:via-[rgba(8,14,24,0.72)] dark:to-transparent" />
-            <div className="pointer-events-none absolute inset-y-6 left-1/2 z-[1] w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(77,141,255,0.32),rgba(77,141,255,0.12),rgba(77,141,255,0.04))]" />
-            <div className="timeline-bob pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.72] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.32em] opacity-78 shadow-[0_14px_28px_rgba(77,141,255,0.12)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.22)]">
-              <span className="block h-4 w-px bg-black/20 dark:bg-white/24" />
-              Scroll
-            </div>
-            <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-white/50 bg-white/[0.66] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] opacity-78 shadow-[0_10px_24px_rgba(77,141,255,0.1)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.16)]">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[rgba(250,247,243,0.96)] via-[rgba(250,247,243,0.76)] to-transparent dark:from-[rgba(17,19,23,0.98)] dark:via-[rgba(17,19,23,0.76)] dark:to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[4.5rem] bg-gradient-to-t from-[rgba(250,247,243,0.96)] via-[rgba(250,247,243,0.76)] to-transparent dark:from-[rgba(17,19,23,0.98)] dark:via-[rgba(17,19,23,0.76)] dark:to-transparent" />
+            <div className="pointer-events-none absolute inset-y-6 left-1/2 z-[1] w-px -translate-x-1/2 bg-[linear-gradient(180deg,rgba(157,100,72,0.18),rgba(157,100,72,0.08),rgba(157,100,72,0.02))]" />
+            <div className="pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full border border-white/50 bg-white/[0.66] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] opacity-78 shadow-[0_10px_24px_rgba(29,27,24,0.08)] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:shadow-[0_12px_24px_rgba(0,0,0,0.16)]">
               Archive map
             </div>
             <button
@@ -506,7 +502,7 @@ export default function Index({ posts, globalData }) {
 
                 timelineRail.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.72] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.3em] shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-black/28 dark:shadow-[0_12px_24px_rgba(0,0,0,0.2)] ${
+              className={`absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.72] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] shadow-[0_10px_24px_rgba(29,27,24,0.1)] backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-black/28 dark:shadow-[0_12px_24px_rgba(0,0,0,0.2)] ${
                 isTimelineScrolled
                   ? 'translate-y-0 opacity-100'
                   : 'pointer-events-none translate-y-2 opacity-0'
@@ -517,7 +513,7 @@ export default function Index({ posts, globalData }) {
             </button>
             <div
               id="timeline-rail"
-              className="max-h-[calc(100vh-8rem)] space-y-10 overflow-y-auto overscroll-contain px-4 pt-16 pb-12"
+              className="max-h-[calc(100vh-8rem)] space-y-10 overflow-y-auto overscroll-contain px-5 pt-16 pb-12"
             >
             {yearGroups.map(([year, yearPosts]) => (
               <section key={year} className="relative">
@@ -525,14 +521,14 @@ export default function Index({ posts, globalData }) {
                   <span
                     className={`absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 ${
                       activeYear === year
-                        ? 'scale-110 border-primary/45 bg-primary/55 shadow-[0_0_0_6px_rgba(77,141,255,0.14)]'
+                        ? 'scale-110 border-primary/45 bg-primary/55 shadow-[0_0_0_6px_rgba(157,100,72,0.12)]'
                         : 'border-black/12 bg-[rgba(248,251,255,0.96)] dark:border-white/16 dark:bg-[#0f1318]'
                     }`}
                   />
                   <h3
-                    className={`relative rounded-full border px-4 py-1 text-[10px] font-semibold tracking-[0.36em] uppercase transition-all duration-300 ${
+                    className={`relative rounded-full border px-4 py-1 text-[10px] font-semibold tracking-[0.24em] uppercase transition-all duration-300 ${
                       activeYear === year
-                        ? 'border-primary/28 bg-primary/10 text-primary shadow-[0_10px_24px_rgba(77,141,255,0.12)]'
+                        ? 'border-primary/28 bg-primary/10 text-primary shadow-[0_10px_24px_rgba(157,100,72,0.1)]'
                         : 'border-black/10 bg-white/50 opacity-72 dark:border-white/10 dark:bg-white/8'
                     }`}
                   >
@@ -556,53 +552,53 @@ export default function Index({ posts, globalData }) {
                           setActiveSlug(post.slug);
                           scrollToPost(post.slug);
                         }}
-                        className={`group relative block min-h-[84px] transition-all duration-300 ${
+                        className={`group relative block min-h-[96px] transition-all duration-300 ${
                           activeSlug === post.slug ? 'z-10' : 'z-[1]'
                         }`}
                       >
                         <span
-                          className={`absolute left-1/2 top-[42px] h-px w-8 -translate-y-1/2 transition-colors duration-300 ${
+                          className={`absolute left-1/2 top-[48px] h-px w-6 -translate-y-1/2 transition-colors duration-300 ${
                             isLeftBranch ? '-translate-x-full' : ''
                           } ${
                             activeSlug === post.slug
-                              ? 'bg-primary/50 dark:bg-primary/58'
+                              ? 'bg-primary/42 dark:bg-primary/52'
                               : 'bg-black/10 dark:bg-white/12'
                           }`}
                         />
                         <span
-                          className={`absolute left-1/2 top-[42px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 group-hover:scale-110 ${
+                          className={`absolute left-1/2 top-[48px] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border transition-all duration-300 group-hover:scale-110 ${
                             activeSlug === post.slug
-                              ? 'border-primary/45 bg-primary/60 shadow-[0_0_0_5px_rgba(77,141,255,0.12)]'
+                              ? 'border-primary/45 bg-primary/60 shadow-[0_0_0_5px_rgba(157,100,72,0.1)]'
                               : 'border-black/12 bg-[rgba(248,251,255,0.96)] dark:border-white/20 dark:bg-[#10141a]'
                           }`}
                         />
                         <div
-                          className={`w-[calc(50%-1.3rem)] ${
+                          className={`w-[calc(50%-0.85rem)] ${
                             isLeftBranch
-                              ? 'pr-6 text-right'
-                              : 'ml-auto pl-6 text-left'
+                              ? 'pr-4 text-right'
+                              : 'ml-auto pl-4 text-left'
                           }`}
                         >
                           <div
-                            className={`rounded-[1.2rem] border px-4 py-3 transition-all duration-300 ${
+                            className={`overflow-hidden rounded-[1.2rem] border px-3.5 py-3 transition-all duration-300 ${
                               activeSlug === post.slug
-                                ? 'border-primary/28 bg-white/[0.78] shadow-[0_18px_32px_rgba(77,141,255,0.14)] dark:border-primary/24 dark:bg-white/12'
+                                ? 'border-primary/24 bg-white/[0.78] shadow-[0_16px_30px_rgba(29,27,24,0.1)] dark:border-primary/22 dark:bg-white/12'
                                 : 'border-white/45 bg-white/[0.46] hover:bg-white/[0.64] dark:border-white/8 dark:bg-white/6 dark:hover:bg-white/10'
                             }`}
                           >
                             <p
-                              className={`text-[10px] font-semibold tracking-[0.28em] uppercase transition-colors duration-300 ${
+                              className={`overflow-hidden text-[9px] font-semibold tracking-[0.12em] uppercase whitespace-nowrap transition-colors duration-300 ${
                                 activeSlug === post.slug
                                   ? 'text-primary opacity-92'
                                   : 'opacity-46'
                               }`}
                             >
                               {formatTimelineDate(post.data.date)}
-                              <span className="mx-1.5 opacity-28">/</span>
+                              <span className="mx-1 opacity-28">/</span>
                               {timeLabel}
                             </p>
                             <p
-                              className={`mt-2 text-[13px] leading-5 transition-all duration-300 line-clamp-2 ${
+                              className={`mt-2 break-words text-[12px] leading-[1.45] transition-all duration-300 line-clamp-3 ${
                                 activeSlug === post.slug
                                   ? 'font-medium text-primary opacity-100'
                                   : 'opacity-74 group-hover:opacity-100'

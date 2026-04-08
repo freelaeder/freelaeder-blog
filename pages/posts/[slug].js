@@ -124,7 +124,7 @@ export default function PostPage({
           <button
             type="button"
             onClick={goBackToTimeline}
-            className="rounded-full border border-white/50 bg-white/[0.76] px-4 py-2 text-xs tracking-[0.24em] uppercase shadow-[0_14px_36px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/30 dark:hover:bg-black/40"
+            className="rounded-full border border-white/50 bg-white/[0.76] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_14px_36px_rgba(29,27,24,0.1)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/30 dark:hover:bg-black/40"
           >
             Back to timeline
           </button>
@@ -140,7 +140,7 @@ export default function PostPage({
           <div className="glass-panel rounded-[2rem] p-4">
             <div className="relative">
               {frontMatter.cover && (
-                <div className="mb-4 overflow-hidden rounded-[1.35rem] border border-white/35 bg-white/35 dark:border-white/10 dark:bg-white/5">
+                <div className="mb-4 overflow-hidden rounded-[1.25rem] border border-white/35 bg-white/35 dark:border-white/10 dark:bg-white/5">
                   <img
                     src={frontMatter.cover}
                     alt={frontMatter.title}
@@ -174,7 +174,7 @@ export default function PostPage({
                   ))}
                 </div>
               )}
-              <div className="mt-5 rounded-[1.2rem] border border-white/35 bg-white/35 px-4 py-3 dark:border-white/10 dark:bg-white/6">
+              <div className="mt-5 rounded-[1.15rem] border border-white/35 bg-white/35 px-4 py-3 dark:border-white/10 dark:bg-white/6">
                 <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">
                   <span>Read</span>
                   <span>{readProgress}%</span>
@@ -190,14 +190,14 @@ export default function PostPage({
                 <button
                   type="button"
                   onClick={scrollToTop}
-                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
+                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_10px_24px_rgba(29,27,24,0.08)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
                 >
                   Back to top
                 </button>
                 <button
                   type="button"
                   onClick={goBackToTimeline}
-                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.22em] uppercase shadow-[0_10px_24px_rgba(77,141,255,0.14)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
+                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_10px_24px_rgba(29,27,24,0.08)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
                 >
                   Back to timeline
                 </button>
@@ -206,10 +206,10 @@ export default function PostPage({
           </div>
         </aside>
       </div>
-      <article className="w-full max-w-4xl px-2 mx-auto md:px-0">
+      <article className="mx-auto w-full max-w-3xl px-0.5 sm:px-2 md:max-w-4xl md:px-0">
         <header ref={heroHeaderRef} className="animate-fade-up">
           {frontMatter.cover && (
-            <div className="glass-panel mb-8 overflow-hidden rounded-[2rem]">
+            <div className="glass-panel mb-6 overflow-hidden rounded-[1.6rem] sm:mb-8 md:rounded-[2rem]">
               <img
                 src={frontMatter.cover}
                 alt={frontMatter.title}
@@ -222,21 +222,21 @@ export default function PostPage({
               {formatDisplayDateTime(frontMatter.date)}
             </p>
           )}
-          <h1 className="mb-6 text-center text-4xl md:text-6xl dark:text-white">
+          <h1 className="mb-5 text-center text-[2.35rem] leading-[1.04] dark:text-white sm:text-[3rem] md:mb-6 md:text-6xl">
             {frontMatter.title}
           </h1>
           {frontMatter.summary && (
-            <p className="mx-auto mb-6 max-w-2xl text-center text-lg leading-8 opacity-75">
+            <p className="mx-auto mb-6 max-w-2xl text-center text-base leading-7 opacity-74 sm:text-lg sm:leading-8">
               {frontMatter.summary}
             </p>
           )}
           {frontMatter.tags?.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 mb-10">
+            <div className="mb-8 flex flex-wrap justify-center gap-2 sm:mb-10">
               {frontMatter.tags.map((tag) => (
                 <Link
                   key={`${frontMatter.slug}-${tag}`}
                   href={`/tags/${tagToSlug(tag)}`}
-                  className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs tracking-[0.18em] uppercase dark:border-white/10 dark:bg-white/10"
+                  className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[11px] tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/10"
                 >
                   {tag}
                 </Link>
@@ -244,7 +244,39 @@ export default function PostPage({
             </div>
           )}
         </header>
-        <main className="glass-panel animate-fade-up rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
+
+        <div className="glass-panel animate-fade-up mb-6 rounded-[1.4rem] px-4 py-4 md:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="section-kicker !text-[10px] !opacity-56">Reading</p>
+              <p className="mt-2 text-sm opacity-72">{readProgress}% complete</p>
+            </div>
+            <div className="h-2 w-24 overflow-hidden rounded-full bg-black/8 dark:bg-white/10">
+              <div
+                className="h-full origin-left rounded-full bg-primary transition-transform duration-300"
+                style={{ transform: `scaleX(${readProgress / 100})` }}
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 border-t border-black/8 pt-4 dark:border-white/10">
+            <button
+              type="button"
+              onClick={goBackToTimeline}
+              className="inline-flex rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/8"
+            >
+              Back to timeline
+            </button>
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="inline-flex rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/8"
+            >
+              Back to top
+            </button>
+          </div>
+        </div>
+
+        <main className="glass-panel animate-fade-up rounded-[1.6rem] px-5 py-6 sm:px-6 sm:py-8 md:rounded-[2rem] md:px-10 md:py-10">
           <article
             className="prose prose-neutral max-w-none dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: html }}
@@ -254,11 +286,11 @@ export default function PostPage({
       <Footer copyrightText={globalData.footerText} />
       <GradientBackground
         variant="large"
-        className="absolute -top-32 opacity-[0.32] dark:opacity-[0.48]"
+        className="absolute -top-32 opacity-[0.22] dark:opacity-[0.34]"
       />
       <GradientBackground
         variant="small"
-        className="absolute bottom-0 opacity-[0.18] dark:opacity-[0.12]"
+        className="absolute bottom-0 opacity-[0.12] dark:opacity-[0.08]"
       />
     </Layout>
   );

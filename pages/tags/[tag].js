@@ -17,34 +17,36 @@ export default function TagPage({ globalData, tag, posts }) {
         description={`${tag.name} 相关文章`}
       />
       <Header name={globalData.name} />
-      <main className="mx-auto w-full max-w-5xl px-2 md:px-0">
-        <section className="glass-panel animate-fade-up rounded-[2rem] px-6 py-8 md:px-10 md:py-10">
+      <main className="mx-auto w-full max-w-5xl px-0.5 sm:px-2 md:px-0">
+        <section className="glass-panel animate-fade-up rounded-[1.6rem] px-5 py-6 sm:px-6 sm:py-8 md:rounded-[2rem] md:px-10 md:py-10">
           <p className="section-kicker mx-auto w-fit">Focused topic</p>
-          <h1 className="mb-4 mt-5 text-center text-4xl lg:text-6xl">{tag.name}</h1>
-          <p className="mb-10 text-center opacity-70">{posts.length} 篇文章</p>
-          <ul className="w-full space-y-4">
+          <h1 className="mb-4 mt-5 text-center text-[2.4rem] sm:text-4xl lg:text-6xl">{tag.name}</h1>
+          <p className="mb-8 text-center text-[15px] opacity-70 sm:mb-10 sm:text-base">{posts.length} 篇文章</p>
+          <ul className="w-full space-y-3 sm:space-y-4">
             {posts.map((post) => (
               <li
                 key={post.slug}
-                className="story-card rounded-[1.6rem] border border-black/10 bg-white/[0.34] backdrop-blur-lg transition hover:border-primary/[0.18] hover:bg-white/[0.5] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]"
+                className="story-card rounded-[1.35rem] border border-black/8 bg-white/[0.56] backdrop-blur-lg transition hover:border-primary/[0.16] hover:bg-white/[0.78] dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06] sm:rounded-[1.6rem]"
               >
                 <Link
                   href={`/posts/${post.slug}`}
-                  className="block px-6 py-6 lg:px-10 lg:py-8"
+                  className="block px-5 py-5 sm:px-6 sm:py-6 lg:px-10 lg:py-8"
                 >
-                  <p className="mb-2 text-sm font-semibold tracking-[0.18em] uppercase opacity-60">
+                  <p className="mb-2 text-[12px] font-semibold tracking-[0.14em] uppercase opacity-60 sm:text-sm sm:tracking-[0.18em]">
                     {post.data.date}
                   </p>
-                  <h2 className="text-2xl">{post.data.title}</h2>
+                  <h2 className="text-[1.35rem] leading-tight sm:text-2xl">{post.data.title}</h2>
                   {post.data.summary && (
-                    <p className="mt-3 opacity-70">{previewText(post.data.summary)}</p>
+                    <p className="mt-3 text-[15px] leading-6 opacity-70 sm:text-base sm:leading-7">
+                      {previewText(post.data.summary)}
+                    </p>
                   )}
                   {post.data.tags?.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {post.data.tags.slice(0, 4).map((postTag) => (
                         <span
                           key={`${post.slug}-${postTag}`}
-                          className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-xs tracking-[0.18em] uppercase dark:border-white/10 dark:bg-white/10"
+                          className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[11px] tracking-[0.12em] uppercase dark:border-white/10 dark:bg-white/10 sm:text-xs sm:tracking-[0.18em]"
                         >
                           {postTag}
                         </span>
@@ -60,11 +62,11 @@ export default function TagPage({ globalData, tag, posts }) {
       <Footer copyrightText={globalData.footerText} />
       <GradientBackground
         variant="large"
-        className="fixed top-12 opacity-[0.28] dark:opacity-[0.46]"
+        className="fixed top-12 opacity-[0.2] dark:opacity-[0.32]"
       />
       <GradientBackground
         variant="small"
-        className="absolute bottom-0 opacity-[0.16] dark:opacity-[0.12]"
+        className="absolute bottom-0 opacity-[0.1] dark:opacity-[0.08]"
       />
     </Layout>
   );
