@@ -8,8 +8,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 14% 0%, rgba(243, 227, 214, 0.42), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 34%);
+    radial-gradient(circle at 14% 0%, rgba(243, 227, 214, 0.32), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 34%);
   pointer-events: none;
   opacity: 0.92;
 }
@@ -24,7 +24,7 @@
   position: absolute;
   inset: 0;
   border-radius: 1.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   opacity: 0.5;
   pointer-events: none;
 }
@@ -37,101 +37,108 @@
 .actionRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .secondaryLink {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.9rem;
+  min-height: 2.7rem;
   border-radius: 999px;
   border: 1px solid rgba(30, 27, 24, 0.08);
-  background: rgba(255, 255, 255, 0.46);
-  padding: 0.65rem 1rem;
-  font-size: 0.66rem;
+  background: rgba(255, 255, 255, 0.42);
+  padding: 0.6rem 0.92rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
 }
 
 .secondaryLink:hover {
   transform: translateY(-1px);
 }
 
-.cardGrid {
+.compactCard {
   display: grid;
-  gap: 1rem;
-}
-
-.primaryColumn,
-.metaPanel {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.copyBlock,
-.metaBlock,
-.metricGrid {
-  border-radius: 1.35rem;
+  gap: 0.9rem;
+  border-radius: 1.4rem;
   border: 1px solid rgba(30, 27, 24, 0.08);
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.4);
   padding: 1rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
 }
 
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.metaPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 27, 24, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.metaPillLabel,
 .blockLabel {
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.45;
+  opacity: 0.46;
 }
 
-.primaryText {
-  margin-top: 0.8rem;
-  font-size: 0.95rem;
-  line-height: 1.85;
+.summaryText {
+  font-size: 0.92rem;
+  line-height: 1.75;
   opacity: 0.72;
+}
+
+.inlineBlock {
+  display: grid;
+  gap: 0.65rem;
 }
 
 .featurePills,
 .stackPills {
-  margin-top: 0.9rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.55rem;
 }
 
 .featurePill {
   display: inline-flex;
   align-items: center;
-  min-height: 2.3rem;
+  min-height: 2rem;
   border-radius: 999px;
   border: 1px solid rgba(30, 27, 24, 0.08);
   background: rgba(255, 255, 255, 0.62);
-  padding: 0.55rem 0.85rem;
-  font-size: 0.78rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.76rem;
   line-height: 1.2;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
 }
 
-.metricGrid {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.metaText {
-  margin-top: 0.8rem;
-  font-size: 0.9rem;
+.footnote {
+  font-size: 0.84rem;
   line-height: 1.75;
-  opacity: 0.72;
+  opacity: 0.64;
 }
 
 :global(.dark) .projectSheet::before {
   background:
-    radial-gradient(circle at 14% 0%, rgba(194, 142, 109, 0.14), transparent 24%),
+    radial-gradient(circle at 14% 0%, rgba(194, 142, 109, 0.12), transparent 22%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 34%);
 }
 
@@ -140,28 +147,10 @@
 }
 
 :global(.dark) .secondaryLink,
-:global(.dark) .copyBlock,
-:global(.dark) .metaBlock,
-:global(.dark) .metricGrid,
+:global(.dark) .compactCard,
+:global(.dark) .metaPill,
 :global(.dark) .featurePill {
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-@media (min-width: 720px) {
-  .metricGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 960px) {
-  .cardGrid {
-    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.82fr);
-    align-items: start;
-  }
-
-  .metricGrid {
-    grid-template-columns: 1fr;
-  }
 }
