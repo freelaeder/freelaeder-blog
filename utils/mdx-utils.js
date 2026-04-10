@@ -5,6 +5,18 @@ import { marked } from 'marked';
 
 // POSTS_PATH is useful when you want to get the path to a specific file
 export const POSTS_PATH = path.join(process.cwd(), 'posts');
+export const DEFAULT_POSTS_PAGE_SIZE = 8;
+export const POST_SUMMARY_PAGES_PATH = path.join(
+  process.cwd(),
+  'public',
+  'generated',
+  'post-pages'
+);
+
+let cachedPosts = [];
+let cachedPostSummaries = [];
+let cachedPostsBySlug = new Map();
+let cachedPostIndexKey = '';
 
 const normalizeTagList = (tags = []) => {
   if (Array.isArray(tags)) {
@@ -69,8 +81,29 @@ export const sortPostsByDate = (posts) => {
   });
 };
 
-export const getPosts = () => {
-  let posts = getPostFilePaths().map((filePath) => {
+const getPostIndexKey = (filePaths) =>
+  filePaths
+    .map((filePath) => {
+      const absoluteFilePath = path.join(POSTS_PATH, filePath);
+      const { mtimeMs, size } = fs.statSync(absoluteFilePath);
+
+      return `${filePath}:${mtimeMs}:${size}`;
+    })
+    .join('|');
+
+const getPostCache = () => {
+  const filePaths = getPostFilePaths();
+  const nextIndexKey = getPostIndexKey(filePaths);
+
+  if (cachedPostIndexKey === nextIndexKey && cachedPosts.length > 0) {
+    return {
+      posts: cachedPosts,
+      summaries: cachedPostSummaries,
+      postsBySlug: cachedPostsBySlug,
+    };
+  }
+
+  let posts = filePaths.map((filePath) => {
     const source = fs.readFileSync(path.join(POSTS_PATH, filePath));
     const { content, data } = matter(source);
 
@@ -83,30 +116,100 @@ export const getPosts = () => {
 
   posts = sortPostsByDate(posts);
 
-  return posts;
+  cachedPosts = posts;
+  cachedPostSummaries = posts.map(({ content, ...post }) => post);
+  cachedPostsBySlug = new Map(posts.map((post) => [post.slug, post]));
+  cachedPostIndexKey = nextIndexKey;
+
+  return {
+    posts: cachedPosts,
+    summaries: cachedPostSummaries,
+    postsBySlug: cachedPostsBySlug,
+  };
 };
 
-export const getPostSummaries = () =>
-  getPosts().map(({ content, ...post }) => post);
+export const getPosts = () => getPostCache().posts;
+
+export const getPostSummaries = ({ offset = 0, limit } = {}) => {
+  const summaries = getPostCache().summaries;
+  const normalizedOffset = Math.max(0, Number(offset) || 0);
+
+  if (typeof limit !== 'number') {
+    return summaries.slice(normalizedOffset);
+  }
+
+  const normalizedLimit = Math.max(0, limit);
+  return summaries.slice(normalizedOffset, normalizedOffset + normalizedLimit);
+};
+
+export const getPostSummariesPage = (
+  offset = 0,
+  limit = DEFAULT_POSTS_PAGE_SIZE
+) => {
+  const summaries = getPostCache().summaries;
+  const normalizedOffset = Math.max(0, Number(offset) || 0);
+  const normalizedLimit = Math.max(1, Number(limit) || DEFAULT_POSTS_PAGE_SIZE);
+  const posts = summaries.slice(
+    normalizedOffset,
+    normalizedOffset + normalizedLimit
+  );
+  const nextOffset = normalizedOffset + posts.length;
+
+  return {
+    posts,
+    total: summaries.length,
+    hasMore: nextOffset < summaries.length,
+    nextOffset,
+  };
+};
+
+export const buildPostSummaryPages = (
+  pageSize = DEFAULT_POSTS_PAGE_SIZE
+) => {
+  const summaries = getPostCache().summaries;
+  const normalizedPageSize = Math.max(1, Number(pageSize) || DEFAULT_POSTS_PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(summaries.length / normalizedPageSize));
+
+  fs.rmSync(POST_SUMMARY_PAGES_PATH, { recursive: true, force: true });
+  fs.mkdirSync(POST_SUMMARY_PAGES_PATH, { recursive: true });
+
+  for (let page = 1; page <= totalPages; page += 1) {
+    const offset = (page - 1) * normalizedPageSize;
+    const pagePayload = getPostSummariesPage(offset, normalizedPageSize);
+
+    fs.writeFileSync(
+      path.join(POST_SUMMARY_PAGES_PATH, `${page}.json`),
+      JSON.stringify({
+        ...pagePayload,
+        page,
+        totalPages,
+      })
+    );
+  }
+
+  return {
+    totalPages,
+    totalPosts: summaries.length,
+  };
+};
 
 export const getPostBySlug = async (slug) => {
-  const post = getPosts().find((entry) => entry.slug === slug);
+  const post = getPostCache().postsBySlug.get(slug);
 
   if (!post) {
     throw new Error(`Post not found for slug: ${slug}`);
   }
 
-  const postFilePath = path.join(POSTS_PATH, post.filePath);
-  const source = fs.readFileSync(postFilePath);
-
-  const { content, data } = matter(source);
-  const normalizedData = normalizePostData(data, post.filePath);
-  const html = await marked.parse(content, {
+  const html = await marked.parse(post.content, {
     gfm: true,
     breaks: false,
   });
 
-  return { html, data: normalizedData, postFilePath };
+  return {
+    html,
+    data: post.data,
+    postFilePath: path.join(POSTS_PATH, post.filePath),
+  };
 };
 
 export const getNextPostBySlug = (slug) => {

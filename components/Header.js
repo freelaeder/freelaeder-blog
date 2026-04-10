@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 const sunIcon = (
@@ -85,8 +86,14 @@ const getResolvedTheme = () => {
 };
 
 export default function Header({ name }) {
+  const router = useRouter();
   const [theme, setTheme] = useState('light');
   const [isCompact, setIsCompact] = useState(false);
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/projects', label: 'Projects' },
+    { href: '/tags', label: 'Tags' },
+  ];
 
   useEffect(() => {
     setTheme(getResolvedTheme());
@@ -152,18 +159,26 @@ export default function Header({ name }) {
             </Link>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <nav className="flex items-center gap-1 text-[10px] uppercase tracking-[0.22em] opacity-72 sm:text-[11px]">
-                <Link
-                  href="/"
-                  className="rounded-full px-2.5 py-2 hover:bg-black/5 dark:hover:bg-white/10 sm:px-3"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/tags"
-                  className="rounded-full px-2.5 py-2 hover:bg-black/5 dark:hover:bg-white/10 sm:px-3"
-                >
-                  Tags
-                </Link>
+                {navItems.map((item) => {
+                  const isActive =
+                    item.href === '/'
+                      ? router.pathname === item.href
+                      : router.pathname.startsWith(item.href);
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`rounded-full px-2.5 py-2 sm:px-3 ${
+                        isActive
+                          ? 'bg-black/6 text-slate-950 dark:bg-white/10 dark:text-white'
+                          : 'hover:bg-black/5 dark:hover:bg-white/10'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
               </nav>
               <ThemeSwitcher theme={theme} onThemeChange={handleThemeChange} />
             </div>
