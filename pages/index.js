@@ -658,44 +658,27 @@ export default function Index({
                           timelineScrollTop: getTimelineScrollTopForSlug(post.slug),
                         });
                       }}
-                      className="group grid items-start gap-4 py-5 transition-colors sm:gap-5 sm:py-6 md:grid-cols-[118px_minmax(0,1fr)_28px] md:py-7"
+                      className="group grid items-start gap-3 py-4 transition-colors sm:gap-4 sm:py-[1.125rem] md:grid-cols-[98px_minmax(0,1fr)_28px] md:gap-3.5 md:py-[1.375rem]"
                     >
                       <div
-                        className={`flex items-start justify-between gap-3 pt-0.5 text-sm font-semibold tracking-[0.14em] uppercase transition-colors duration-300 md:block md:pt-1 ${
+                        className={`flex flex-col gap-2 pt-0.5 text-sm font-semibold tracking-[0.14em] uppercase transition-colors duration-300 md:pt-1 ${
                           activeSlug === post.slug
                             ? 'text-primary opacity-95'
                             : 'opacity-48'
                         }`}
                       >
-                        <p>{formatTimelineDate(post.data.date)}</p>
-                        <p className="text-[11px] tracking-[0.2em] opacity-65 md:mt-1">
-                          {getDateParts(post.data.date).time || '00:00'}
-                        </p>
-                      </div>
-
-                      <div className="min-w-0">
-                        <h4
-                          className={`text-[1.35rem] leading-tight transition-all duration-300 group-hover:translate-x-1 sm:text-[1.55rem] md:text-[1.9rem] ${
-                            activeSlug === post.slug ? 'text-primary' : ''
-                          }`}
-                        >
-                          {post.data.title}
-                        </h4>
-                        {post.data.summary && (
-                          <p
-                            className={`mt-2.5 max-w-2xl text-[15px] leading-6 break-words line-clamp-2 sm:mt-3 sm:text-base sm:leading-7 ${
-                              activeSlug === post.slug ? 'opacity-80' : 'opacity-62'
-                            }`}
-                          >
-                            {previewText(post.data.summary)}
+                        <div className="flex items-start justify-between gap-3 md:block">
+                          <p>{formatTimelineDate(post.data.date)}</p>
+                          <p className="text-[11px] tracking-[0.2em] opacity-65 md:mt-1">
+                            {getDateParts(post.data.date).time || '00:00'}
                           </p>
-                        )}
+                        </div>
                         {post.data.tags?.length > 0 && (
-                          <div className="mt-3.5 flex flex-wrap gap-2 sm:mt-4">
+                          <div className="flex flex-wrap gap-1.5 md:pt-0.5">
                             {post.data.tags.slice(0, 3).map((tag) => (
                               <span
                                 key={`${post.slug}-${tag}`}
-                                className={`rounded-full px-2.5 py-1 text-[10px] tracking-[0.18em] uppercase sm:px-3 sm:text-[11px] ${
+                                className={`rounded-full px-2 py-0.5 text-[9px] tracking-[0.16em] uppercase sm:px-2.5 sm:text-[10px] ${
                                   activeSlug === post.slug
                                     ? 'border border-primary/15 bg-primary/10 text-primary dark:bg-primary/15'
                                     : 'border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/10'
@@ -705,6 +688,25 @@ export default function Index({
                               </span>
                             ))}
                           </div>
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <h4
+                          className={`text-[1.35rem] leading-tight transition-all duration-300 group-hover:translate-x-1 sm:text-[1.55rem] md:text-[1.85rem] ${
+                            activeSlug === post.slug ? 'text-primary' : ''
+                          }`}
+                        >
+                          {post.data.title}
+                        </h4>
+                        {post.data.summary && (
+                          <p
+                            className={`mt-2 max-w-2xl text-[15px] leading-6 break-words line-clamp-2 sm:mt-2.5 sm:text-base sm:leading-7 ${
+                              activeSlug === post.slug ? 'opacity-80' : 'opacity-62'
+                            }`}
+                          >
+                            {previewText(post.data.summary)}
+                          </p>
                         )}
                       </div>
 
