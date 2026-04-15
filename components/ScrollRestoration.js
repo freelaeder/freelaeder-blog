@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 const getKey = (url) => `scroll-position:${url}`;
 const getScrollContainer = () =>
   document.getElementById('page-scroll-container');
+const HOME_TIMELINE_RETURN_KEY = 'home-timeline-return';
 
 export default function ScrollRestoration() {
   const router = useRouter();
@@ -59,9 +60,17 @@ export default function ScrollRestoration() {
     const handleBeforeUnload = () => saveScrollPosition();
     const handleRouteChangeStart = () => saveScrollPosition();
     const handleRouteChangeComplete = (url) => {
+      const isReturningToArchive =
+        sessionStorage.getItem(HOME_TIMELINE_RETURN_KEY) === '1' &&
+        (url === '/' || url.startsWith('/?'));
+
       if (shouldRestoreRef.current) {
         shouldRestoreRef.current = false;
         restoreScrollPosition(url);
+        return;
+      }
+
+      if (isReturningToArchive) {
         return;
       }
 

@@ -1,12 +1,11 @@
+import { startTransition, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { getGlobalData } from '../../utils/global-data';
 import {
   getPostBySlug,
   getPosts,
 } from '../../utils/mdx-utils';
-
-import { startTransition, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 import Footer from '../../components/Footer';
 import Header from '../../components/Header';
 import Layout, { GradientBackground } from '../../components/Layout';
@@ -17,15 +16,50 @@ import { formatDisplayDateTime } from '../../utils/date-utils';
 const HOME_TIMELINE_RETURN_KEY = 'home-timeline-return';
 const HOME_TIMELINE_RETURN_SLUG_KEY = 'home-timeline-return-slug';
 
+const arrowUpIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M12 19V5M12 5l-5 5M12 5l5 5"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const archiveIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="M9 7H5v4M5 11l5-5a7 7 0 111.5 11.5"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default function PostPage({
   html,
   frontMatter,
   globalData,
 }) {
   const router = useRouter();
-  const [isMetaDocked, setIsMetaDocked] = useState(false);
   const [readProgress, setReadProgress] = useState(0);
-  const heroHeaderRef = useRef(null);
+  const [showFloatingActions, setShowFloatingActions] = useState(false);
 
   const scrollToTop = () => {
     const scrollContainer = document.getElementById('page-scroll-container');
@@ -56,9 +90,7 @@ export default function PostPage({
     }
 
     const handleScroll = () => {
-      const nextScrolledState = scrollContainer.scrollTop > 48;
-      const scrollContainerRect = scrollContainer.getBoundingClientRect();
-      const heroHeaderRect = heroHeaderRef.current?.getBoundingClientRect();
+      const currentScrollTop = scrollContainer.scrollTop;
       const maxScrollableDistance =
         scrollContainer.scrollHeight - scrollContainer.clientHeight;
       const nextReadProgress =
@@ -68,22 +100,18 @@ export default function PostPage({
               Math.max(
                 0,
                 Math.round(
-                  (scrollContainer.scrollTop / maxScrollableDistance) * 100
+                  (currentScrollTop / maxScrollableDistance) * 100
                 )
               )
             )
           : 0;
 
-      setIsMetaDocked(
-        heroHeaderRect
-          ? heroHeaderRect.bottom <= scrollContainerRect.top + 104
-          : scrollContainer.scrollTop > 220
-      );
       setReadProgress(nextReadProgress);
+      setShowFloatingActions(currentScrollTop > 180);
 
       window.dispatchEvent(
         new CustomEvent('header-compact-state', {
-          detail: { isScrolled: nextScrolledState },
+          detail: { isScrolled: currentScrollTop > 36 },
         })
       );
     };
@@ -106,191 +134,116 @@ export default function PostPage({
   }, [router]);
 
   return (
-    <Layout>
+    <Layout contentClassName="max-w-[980px]">
       <SEO
         title={`${frontMatter.title} - ${globalData.name}`}
         description={frontMatter.summary}
         image={frontMatter.cover}
       />
-      <Header name={globalData.name} />
-      <div className="fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 xl:block">
+
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px bg-black/8 dark:bg-white/10">
         <div
-          className={`transition-all duration-300 ${
-            isMetaDocked
-              ? 'pointer-events-none translate-x-6 scale-95 opacity-0'
-              : 'translate-x-0 scale-100 opacity-100'
-          }`}
-        >
+          className="h-full bg-neutral-950 transition-[width] duration-200 dark:bg-white"
+          style={{ width: `${readProgress}%` }}
+        />
+      </div>
+
+      <Header name={globalData.name} />
+
+      <div
+        className={`fixed inset-x-4 bottom-4 z-50 transition-all duration-200 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 ${
+          showFloatingActions
+            ? 'translate-y-0 opacity-100'
+            : 'pointer-events-none translate-y-4 opacity-0'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-2 rounded-[1.2rem] border border-black/10 bg-[rgba(252,251,248,0.94)] px-3 py-3 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.28)] backdrop-blur-sm dark:border-white/10 dark:bg-[rgba(21,21,19,0.92)] sm:justify-center sm:gap-3">
+          <button
+            type="button"
+            aria-label="Back to top"
+            onClick={scrollToTop}
+            className="icon-button"
+          >
+            {arrowUpIcon}
+          </button>
+          <button
+            type="button"
+            aria-label="Back to archive"
+            onClick={goBackToTimeline}
+            className="icon-button"
+          >
+            {archiveIcon}
+          </button>
+          <span className="shrink-0 text-[0.68rem] tracking-[0.18em] text-neutral-500 uppercase dark:text-white/40">
+            {readProgress}% read
+          </span>
+        </div>
+      </div>
+
+      <article className="mx-auto w-full max-w-[760px] pb-8 pt-4 sm:pt-8">
+        <div className="animate-fade-up">
           <button
             type="button"
             onClick={goBackToTimeline}
-            className="rounded-full border border-white/50 bg-white/[0.76] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_14px_36px_rgba(29,27,24,0.1)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/30 dark:hover:bg-black/40"
+            aria-label="Back to archive"
+            className="icon-button"
           >
-            Back to timeline
+            {archiveIcon}
           </button>
-        </div>
 
-        <aside
-          className={`absolute right-0 top-1/2 w-[18rem] -translate-y-1/2 transition-all duration-400 ${
-            isMetaDocked
-              ? 'translate-x-0 scale-100 opacity-100'
-              : 'pointer-events-none translate-x-10 scale-95 opacity-0'
-          }`}
-        >
-          <div className="glass-panel rounded-[2rem] p-4">
-            <div className="relative">
-              {frontMatter.cover && (
-                <div className="mb-4 overflow-hidden rounded-[1.25rem] border border-white/35 bg-white/35 dark:border-white/10 dark:bg-white/5">
-                  <img
-                    src={frontMatter.cover}
-                    alt={frontMatter.title}
-                    className="block aspect-[1.2/1] w-full object-cover"
-                  />
-                </div>
-              )}
-              {frontMatter.date && (
-                <p className="section-kicker !text-[10px] !opacity-60">
-                  {formatDisplayDateTime(frontMatter.date)}
-                </p>
-              )}
-              <h2 className="mt-3 text-2xl leading-tight dark:text-white">
-                {frontMatter.title}
-              </h2>
-              {frontMatter.summary && (
-                <p className="mt-3 text-sm leading-7 opacity-72">
-                  {frontMatter.summary}
-                </p>
-              )}
-              {frontMatter.tags?.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {frontMatter.tags.slice(0, 3).map((tag) => (
-                    <Link
-                      key={`${frontMatter.slug}-dock-${tag}`}
-                      href={`/tags/${tagToSlug(tag)}`}
-                      className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[11px] tracking-[0.18em] uppercase dark:border-white/10 dark:bg-white/10"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              )}
-              <div className="mt-5 rounded-[1.15rem] border border-white/35 bg-white/35 px-4 py-3 dark:border-white/10 dark:bg-white/6">
-                <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">
-                  <span>Read</span>
-                  <span>{readProgress}%</span>
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/8 dark:bg-white/10">
-                  <div
-                    className="h-full origin-left rounded-full bg-primary transition-transform duration-300"
-                    style={{ transform: `scaleX(${readProgress / 100})` }}
-                  />
-                </div>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2 border-t border-black/10 pt-4 dark:border-white/10">
-                <button
-                  type="button"
-                  onClick={scrollToTop}
-                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_10px_24px_rgba(29,27,24,0.08)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
-                >
-                  Back to top
-                </button>
-                <button
-                  type="button"
-                  onClick={goBackToTimeline}
-                  className="inline-flex rounded-full border border-white/55 bg-white/[0.72] px-4 py-2 text-xs tracking-[0.2em] uppercase shadow-[0_10px_24px_rgba(29,27,24,0.08)] backdrop-blur-md transition-colors hover:bg-white dark:border-white/10 dark:bg-black/28 dark:hover:bg-black/40"
-                >
-                  Back to timeline
-                </button>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-      <article className="mx-auto w-full max-w-3xl px-0.5 sm:px-2 md:max-w-4xl md:px-0">
-        <header ref={heroHeaderRef} className="animate-fade-up">
-          {frontMatter.cover && (
-            <div className="glass-panel mb-6 overflow-hidden rounded-[1.6rem] sm:mb-8 md:rounded-[2rem]">
-              <img
-                src={frontMatter.cover}
-                alt={frontMatter.title}
-                className="block object-cover w-full aspect-16/9"
-              />
-            </div>
-          )}
           {frontMatter.date && (
-            <p className="section-kicker mx-auto mb-4 w-fit !text-[11px] !opacity-64">
-              {formatDisplayDateTime(frontMatter.date)}
-            </p>
+            <p className="section-kicker mt-7">{formatDisplayDateTime(frontMatter.date)}</p>
           )}
-          <h1 className="mb-5 text-center text-[2.35rem] leading-[1.04] dark:text-white sm:text-[3rem] md:mb-6 md:text-6xl">
+
+          <h1 className="mt-5 text-[clamp(2.15rem,7vw,4.1rem)] leading-[0.98] text-neutral-950 dark:text-white">
             {frontMatter.title}
           </h1>
+
           {frontMatter.summary && (
-            <p className="mx-auto mb-6 max-w-2xl text-center text-base leading-7 opacity-74 sm:text-lg sm:leading-8">
+            <p className="mt-6 max-w-[40rem] text-[15px] leading-8 text-neutral-600 dark:text-white/60 sm:text-lg">
               {frontMatter.summary}
             </p>
           )}
+
           {frontMatter.tags?.length > 0 && (
-            <div className="mb-8 flex flex-wrap justify-center gap-2 sm:mb-10">
+            <div className="mt-6 flex flex-wrap gap-2">
               {frontMatter.tags.map((tag) => (
                 <Link
                   key={`${frontMatter.slug}-${tag}`}
                   href={`/tags/${tagToSlug(tag)}`}
-                  className="rounded-full border border-black/10 bg-black/5 px-3 py-1 text-[11px] tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/10"
+                  className="tech-pill hover:border-black/14 hover:text-neutral-900 dark:hover:border-white/16 dark:hover:text-white"
                 >
                   {tag}
                 </Link>
               ))}
             </div>
           )}
-        </header>
 
-        <div className="glass-panel animate-fade-up mb-6 rounded-[1.4rem] px-4 py-4 md:hidden">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="section-kicker !text-[10px] !opacity-56">Reading</p>
-              <p className="mt-2 text-sm opacity-72">{readProgress}% complete</p>
-            </div>
-            <div className="h-2 w-24 overflow-hidden rounded-full bg-black/8 dark:bg-white/10">
-              <div
-                className="h-full origin-left rounded-full bg-primary transition-transform duration-300"
-                style={{ transform: `scaleX(${readProgress / 100})` }}
-              />
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2 border-t border-black/8 pt-4 dark:border-white/10">
-            <button
-              type="button"
-              onClick={goBackToTimeline}
-              className="inline-flex rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/8"
-            >
-              Back to timeline
-            </button>
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className="inline-flex rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[11px] font-semibold tracking-[0.14em] uppercase dark:border-white/10 dark:bg-white/8"
-            >
-              Back to top
-            </button>
-          </div>
         </div>
 
-        <main className="glass-panel animate-fade-up rounded-[1.6rem] px-5 py-6 sm:px-6 sm:py-8 md:rounded-[2rem] md:px-10 md:py-10">
+        {frontMatter.cover && (
+          <div className="animate-fade-up mt-10 overflow-hidden rounded-[1rem] border border-black/8 dark:border-white/10">
+            <img
+              src={frontMatter.cover}
+              alt={frontMatter.title}
+              className="block aspect-[16/9] w-full object-cover"
+            />
+          </div>
+        )}
+
+        <main className="animate-fade-up mt-10 border-t border-black/8 pt-8 dark:border-white/10 sm:pt-10">
           <article
             className="prose prose-neutral max-w-none dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: html }}
           />
         </main>
       </article>
+
       <Footer copyrightText={globalData.footerText} />
-      <GradientBackground
-        variant="large"
-        className="absolute -top-32 opacity-[0.22] dark:opacity-[0.34]"
-      />
+      <GradientBackground variant="large" className="fixed top-0 opacity-80" />
       <GradientBackground
         variant="small"
-        className="absolute bottom-0 opacity-[0.12] dark:opacity-[0.08]"
+        className="absolute bottom-0 opacity-70"
       />
     </Layout>
   );

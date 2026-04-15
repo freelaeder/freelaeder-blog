@@ -1,11 +1,9 @@
 export default function Footer({ copyrightText }) {
   return (
-    <footer className="py-12 md:py-16">
-      <div className="glass-panel flex flex-col items-center justify-between gap-4 rounded-[1.5rem] px-5 py-5 text-center md:flex-row md:px-6 md:text-left">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] opacity-62">
-          {copyrightText}
-        </p>
-        <span className="tech-pill px-3 py-1">Field Notes</span>
+    <footer className="mt-auto pt-16">
+      <div className="flex flex-col items-center justify-between gap-3 border-t border-black/8 py-6 text-center text-[0.72rem] tracking-[0.18em] text-neutral-500 uppercase dark:border-white/10 dark:text-white/45 sm:flex-row sm:text-left">
+        <p>{copyrightText}</p>
+        <p>Quiet archive</p>
       </div>
     </footer>
   );

@@ -14,9 +14,9 @@ const sunIcon = (
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth="1.8"
     >
-      <path d="M12.5 17a5 5 0 100-10 5 5 0 000 10zM12.5 1v2M12.5 21v2M4.72 4.22l1.42 1.42M18.86 18.36l1.42 1.42M1.5 12h2M21.5 12h2M4.72 19.78l1.42-1.42M18.86 5.64l1.42-1.42"></path>
+      <path d="M12.5 17a5 5 0 100-10 5 5 0 000 10zM12.5 1v2M12.5 21v2M4.72 4.22l1.42 1.42M18.86 18.36l1.42 1.42M1.5 12h2M21.5 12h2M4.72 19.78l1.42-1.42M18.86 5.64l1.42-1.42" />
     </g>
   </svg>
 );
@@ -33,41 +33,17 @@ const moonIcon = (
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
+      strokeWidth="1.8"
       d="M19.5 10.79A9 9 0 119.71 1a7 7 0 009.79 9.79v0z"
-    ></path>
+    />
   </svg>
 );
 
-function ThemeSwitcher({ theme, onThemeChange }) {
-  const getButtonClassName = (targetTheme) =>
-    `flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300 ${
-      theme === targetTheme
-        ? 'bg-black text-white shadow-[0_12px_28px_rgba(29,27,24,0.16)] dark:bg-white dark:text-slate-950'
-        : 'text-slate-700/68 hover:bg-black/5 hover:text-slate-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white'
-    }`;
-
-  return (
-    <div className="flex items-center gap-1 rounded-full border border-black/8 bg-white/[0.55] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-md dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-      <button
-        type="button"
-        aria-label="Use Light Mode"
-        onClick={() => onThemeChange('light')}
-        className={getButtonClassName('light')}
-      >
-        {sunIcon}
-      </button>
-      <button
-        type="button"
-        aria-label="Use Dark Mode"
-        onClick={() => onThemeChange('dark')}
-        className={getButtonClassName('dark')}
-      >
-        {moonIcon}
-      </button>
-    </div>
-  );
-}
+const navItems = [
+  { href: '/', label: 'Blog' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/tags', label: 'Tags' },
+];
 
 const getResolvedTheme = () => {
   if (typeof window === 'undefined') {
@@ -89,11 +65,6 @@ export default function Header({ name }) {
   const router = useRouter();
   const [theme, setTheme] = useState('light');
   const [isCompact, setIsCompact] = useState(false);
-  const navItems = [
-    { href: '/', label: 'Home' },
-    { href: '/projects', label: 'Projects' },
-    { href: '/tags', label: 'Tags' },
-  ];
 
   useEffect(() => {
     setTheme(getResolvedTheme());
@@ -125,76 +96,67 @@ export default function Header({ name }) {
     };
   }, []);
 
-  const handleThemeChange = (nextTheme) => {
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
 
+    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
     localStorage.setItem('theme', nextTheme);
     setTheme(nextTheme);
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full py-3 md:py-4">
-      <div className="relative h-[68px] md:h-[72px]">
-        <div
-          className={`absolute inset-0 transition-all duration-300 ${
-            isCompact
-              ? 'pointer-events-none -translate-x-14 translate-y-[-10px] scale-[0.86] opacity-0'
-              : 'translate-y-0 scale-100 opacity-100'
-          }`}
+    <header
+      className={`sticky top-0 z-40 -mx-5 px-5 py-4 backdrop-blur-sm transition-colors sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10 ${
+        isCompact
+          ? 'bg-[rgba(247,246,242,0.9)] dark:bg-[rgba(16,16,15,0.86)]'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="mx-auto flex w-full max-w-[1120px] items-center justify-between border-b border-black/8 pb-3 dark:border-white/10">
+        <Link
+          href="/"
+          className="text-[0.8rem] font-semibold tracking-[0.26em] text-neutral-900 uppercase dark:text-white"
         >
-          <div className="glass-panel flex items-center justify-between rounded-[1.6rem] px-3 py-3 sm:px-4 md:rounded-[2rem] md:px-5">
-            <Link
-              href="/"
-              className="flex min-w-0 items-center gap-2.5 text-[11px] font-semibold tracking-[0.22em] uppercase dark:text-white sm:gap-3 sm:text-sm"
-            >
-              <span className="pulse-glow block h-2.5 w-2.5 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-2))] sm:h-3 sm:w-3" />
-              <span className="truncate">{name}</span>
-              <span className="tech-pill hidden px-3 py-1 md:inline-flex">
-                Archive
-              </span>
-            </Link>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <nav className="flex items-center gap-1 text-[10px] uppercase tracking-[0.22em] opacity-72 sm:text-[11px]">
-                {navItems.map((item) => {
-                  const isActive =
-                    item.href === '/'
-                      ? router.pathname === item.href
-                      : router.pathname.startsWith(item.href);
+          {name}
+        </Link>
 
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`rounded-full px-2.5 py-2 sm:px-3 ${
-                        isActive
-                          ? 'bg-black/6 text-slate-950 dark:bg-white/10 dark:text-white'
-                          : 'hover:bg-black/5 dark:hover:bg-white/10'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
-              <ThemeSwitcher theme={theme} onThemeChange={handleThemeChange} />
-            </div>
-          </div>
-        </div>
+        <div className="flex items-center gap-3 sm:gap-5">
+          <nav className="flex items-center gap-3 text-[0.72rem] tracking-[0.18em] text-neutral-500 uppercase sm:gap-5">
+            {navItems.map((item) => {
+              const isActive =
+                item.href === '/'
+                  ? router.pathname === item.href
+                  : router.pathname.startsWith(item.href);
 
-        <div
-          className={`absolute left-0 top-0 transition-all duration-300 ${
-            isCompact
-              ? 'translate-x-0 translate-y-0 scale-100 opacity-100'
-              : 'pointer-events-none translate-x-14 translate-y-3 scale-75 opacity-0'
-          }`}
-        >
-          <div className="glass-panel flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full md:h-14 md:w-14">
-            <span className="pulse-glow block h-3 w-3 rounded-full bg-[linear-gradient(135deg,var(--theme-gradient-1),var(--theme-gradient-2))] md:h-3.5 md:w-3.5" />
-          </div>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative rounded-full px-2 py-1.5 ${
+                    isActive
+                      ? 'bg-black/[0.05] text-neutral-950 dark:bg-white/[0.08] dark:text-white'
+                      : 'hover:bg-black/[0.04] hover:text-neutral-900 dark:hover:bg-white/[0.06] dark:hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                  <span
+                    className={`absolute inset-x-2 bottom-0 h-px origin-left bg-current transition-transform ${
+                      isActive ? 'scale-x-100' : 'scale-x-0'
+                    }`}
+                  />
+                </Link>
+              );
+            })}
+          </nav>
+
+          <button
+            type="button"
+            aria-label={theme === 'dark' ? 'Use Light Mode' : 'Use Dark Mode'}
+            onClick={toggleTheme}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/8 bg-transparent text-neutral-600 hover:border-black/14 hover:bg-black/[0.04] hover:text-neutral-950 dark:border-white/10 dark:text-white/65 dark:hover:border-white/16 dark:hover:bg-white/[0.07] dark:hover:text-white"
+          >
+            {theme === 'dark' ? sunIcon : moonIcon}
+          </button>
         </div>
       </div>
     </header>

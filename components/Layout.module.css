@@ -5,82 +5,68 @@
   }
 
   50% {
-    transform: translateX(-48%) translateY(22px) scale(1.05);
+    transform: translateX(-49%) translateY(12px) scale(1.02);
   }
 }
 
 @keyframes gradientDriftReverse {
   0%,
   100% {
-    transform: translateX(-50%) rotate(188deg) translateY(0) scale(1);
+    transform: translateX(-50%) rotate(180deg) translateY(0) scale(1);
   }
 
   50% {
-    transform: translateX(-52%) rotate(191deg) translateY(-18px) scale(1.04);
+    transform: translateX(-51%) rotate(182deg) translateY(-10px) scale(1.02);
   }
 }
 
 .colorBackground {
   left: 50%;
+  top: -5rem;
   transform: translateX(-50%);
-  background: radial-gradient(
-      at 18% 22%,
-      color-mix(in srgb, var(--color-gradient-1) 66%, transparent) 0,
-      transparent 24%
+  width: min(72rem, 92vw);
+  height: 26rem;
+  background:
+    radial-gradient(
+      circle at 18% 26%,
+      color-mix(in srgb, var(--color-gradient-1) 18%, transparent) 0,
+      transparent 30%
     ),
     radial-gradient(
-      at 72% 18%,
-      color-mix(in srgb, var(--color-gradient-2) 42%, transparent) 0,
-      transparent 28%
-    ),
-    radial-gradient(
-      at 44% 68%,
-      color-mix(in srgb, var(--color-gradient-3) 34%, transparent) 0,
-      transparent 34%
-    ),
-    radial-gradient(
-      at 88% 72%,
-      color-mix(in srgb, var(--color-gradient-4) 42%, transparent) 0,
+      circle at 82% 18%,
+      color-mix(in srgb, var(--color-gradient-3) 12%, transparent) 0,
       transparent 26%
+    ),
+    radial-gradient(
+      circle at 52% 68%,
+      rgba(255, 255, 255, 0.45) 0,
+      transparent 36%
     );
-  max-height: 860px;
-  height: 76vh;
-  max-width: 1320px;
-  width: 100%;
-  filter: blur(88px);
-  opacity: 0.54;
-  animation: gradientDrift 24s ease-in-out infinite;
+  filter: blur(68px);
+  opacity: 0.34;
+  animation: gradientDrift 22s ease-in-out infinite;
   z-index: -1;
 }
 
 .colorBackgroundBottom {
   left: 50%;
-  transform: translateX(-50%) rotate(188deg);
-  background: radial-gradient(
-      at 22% 18%,
-      color-mix(in srgb, var(--color-gradient-1) 42%, transparent) 0,
-      transparent 26%
+  bottom: -7rem;
+  transform: translateX(-50%) rotate(180deg);
+  width: min(60rem, 86vw);
+  height: 20rem;
+  background:
+    radial-gradient(
+      circle at 24% 22%,
+      color-mix(in srgb, var(--color-gradient-1) 12%, transparent) 0,
+      transparent 28%
     ),
     radial-gradient(
-      at 76% 24%,
-      color-mix(in srgb, var(--color-gradient-2) 34%, transparent) 0,
+      circle at 72% 26%,
+      color-mix(in srgb, var(--color-gradient-4) 14%, transparent) 0,
       transparent 30%
-    ),
-    radial-gradient(
-      at 44% 62%,
-      color-mix(in srgb, var(--color-gradient-3) 26%, transparent) 0,
-      transparent 38%
-    ),
-    radial-gradient(
-      at 84% 74%,
-      color-mix(in srgb, var(--color-gradient-4) 32%, transparent) 0,
-      transparent 34%
     );
-  height: 560px;
-  max-width: 980px;
-  width: 100%;
-  filter: blur(72px);
-  opacity: 0.34;
-  animation: gradientDriftReverse 28s ease-in-out infinite;
+  filter: blur(64px);
+  opacity: 0.24;
+  animation: gradientDriftReverse 24s ease-in-out infinite;
   z-index: -1;
 }
