@@ -6,7 +6,7 @@ import styles from '../styles/Projects.module.css';
 import { featuredProjects } from '../utils/featured-projects';
 import { getGlobalData } from '../utils/global-data';
 
-function ProjectFeature({ project, index }) {
+function ProjectFeature({ project }) {
   return (
     <article className={`${styles.projectSheet} glass-panel rounded-[2rem]`}>
       <div className={`${styles.projectFrame} px-5 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8`}>
@@ -96,6 +96,8 @@ function ProjectFeature({ project, index }) {
 }
 
 export default function Projects({ globalData }) {
+  const hasProjects = featuredProjects.length > 0;
+
   return (
     <Layout contentClassName="max-w-[1360px]">
       <SEO
@@ -105,11 +107,23 @@ export default function Projects({ globalData }) {
       <Header name={globalData.name} />
       <main className="pb-14 pt-4 sm:pt-6 md:pb-20">
         <section className="mx-auto max-w-[860px]">
-          <div className="space-y-6">
-            {featuredProjects.map((project, index) => (
-              <ProjectFeature key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          {hasProjects ? (
+            <div className="space-y-6">
+              {featuredProjects.map((project, index) => (
+                <ProjectFeature key={project.id} project={project} />
+              ))}
+            </div>
+          ) : (
+            <article className="glass-panel rounded-[2rem] px-6 py-10 text-center sm:px-8 sm:py-12">
+              <p className="section-kicker">Projects</p>
+              <h2 className="mt-4 text-[2rem] leading-[1.02] sm:text-[2.4rem]">
+                Featured work is being refreshed.
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-7 opacity-72 sm:text-[15px]">
+                旧项目数据已经下线，新的案例整理完成后会在这里更新。
+              </p>
+            </article>
+          )}
         </section>
       </main>
       <Footer copyrightText={globalData.footerText} />
