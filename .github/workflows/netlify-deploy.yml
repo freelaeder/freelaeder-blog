@@ -3,7 +3,7 @@ name: Netlify Deploy
 on:
   push:
     branches:
-      - "codex/blog-migration"
+      - "master"
   workflow_dispatch:
 
 permissions:
