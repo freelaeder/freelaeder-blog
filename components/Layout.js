@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import { useEffect } from 'react';
+import GrowingTreeCanvas from './GrowingTreeCanvas';
 import ScrollToTopButton from './ScrollToTopButton';
 import styles from './Layout.module.css';
 
@@ -52,6 +53,7 @@ export default function Layout({ children, contentClassName = '' }) {
         <div className="site-background" />
         <div className="site-noise" />
       </div>
+      <GrowingTreeCanvas />
       <div
         className={`relative z-10 mx-auto flex min-h-full w-full max-w-[1120px] flex-col px-5 pb-16 pt-2 sm:px-8 sm:pb-24 lg:px-10 ${contentClassName}`}
       >

@@ -40,25 +40,25 @@ export default function TagPage({ globalData, tag, posts }) {
             {posts.map((post, index) => (
               <li
                 key={post.slug}
-                className="animate-fade-up"
+                className="story-card animate-fade-up"
                 style={{ animationDelay: `${Math.min(index * 35, 260)}ms` }}
               >
                 <Link
                   href={`/posts/${post.slug}`}
-                  className="group grid gap-2 px-1 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6 sm:py-6"
+                  className="group grid gap-2 rounded-[1rem] px-3 py-5 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6 sm:py-6"
                 >
-                  <div>
-                    <h2 className="text-[1.24rem] leading-[1.35] text-neutral-900 group-hover:text-black dark:text-white sm:text-[1.48rem]">
+                  <div className="min-w-0">
+                    <h2 className="text-[1.24rem] leading-[1.35] text-neutral-900 transition-colors group-hover:text-neutral-950 dark:text-white sm:text-[1.48rem] dark:group-hover:text-white">
                       {post.data.title}
                     </h2>
                     {post.data.summary && (
-                      <p className="mt-2 max-w-[36rem] text-sm leading-7 text-neutral-500 dark:text-white/48">
+                      <p className="line-clamp-1 mt-2 max-w-full text-sm leading-7 text-neutral-500 transition-colors group-hover:text-neutral-700 dark:text-white/48 dark:group-hover:text-white/68 sm:max-w-[36rem]">
                         {previewText(post.data.summary)}
                       </p>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2.5 text-[0.68rem] tracking-[0.18em] text-neutral-400 uppercase dark:text-white/35 sm:justify-end sm:pt-1">
+                  <div className="flex items-center gap-2.5 text-[0.68rem] tracking-[0.18em] text-neutral-400 uppercase transition-colors group-hover:text-neutral-600 dark:text-white/35 sm:justify-end sm:pt-1 dark:group-hover:text-white/54">
                     <time>{formatDisplayDate(post.data.date)}</time>
                   </div>
                 </Link>

@@ -441,7 +441,6 @@ export default function Index({
               <div className="relative border-t border-black/8 pt-7 dark:border-white/10 sm:pt-8">
                 <ul className="divide-y divide-black/7 dark:divide-white/10">
                   {yearPosts.map((post, index) => {
-                    const isActive = activeSlug === post.slug;
                     const firstTag = post.data.tags?.[0];
 
                     return (
@@ -449,11 +448,7 @@ export default function Index({
                         key={post.slug}
                         id={`post-${post.slug}`}
                         style={{ animationDelay: `${Math.min(index * 35, 280)}ms` }}
-                        className={`story-card animate-fade-up ${
-                          isActive
-                            ? 'bg-black/[0.04] shadow-[0_10px_26px_-22px_rgba(0,0,0,0.28)] dark:bg-white/[0.06] dark:shadow-[0_10px_26px_-22px_rgba(0,0,0,0.5)]'
-                            : ''
-                        }`}
+                        className="story-card animate-fade-up"
                       >
                         <Link
                           as={`/posts/${post.slug}`}
@@ -469,7 +464,7 @@ export default function Index({
                               {post.data.title}
                             </h2>
                             {post.data.summary && (
-                              <p className="mt-2 max-w-[36rem] text-sm leading-7 text-neutral-500 transition-colors group-hover:text-neutral-700 dark:text-white/48 dark:group-hover:text-white/68">
+                              <p className="line-clamp-1 mt-2 max-w-full text-sm leading-7 text-neutral-500 transition-colors group-hover:text-neutral-700 dark:text-white/48 dark:group-hover:text-white/68 sm:max-w-[36rem]">
                                 {previewText(post.data.summary)}
                               </p>
                             )}

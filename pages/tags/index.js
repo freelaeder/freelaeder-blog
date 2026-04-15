@@ -21,9 +21,6 @@ export default function TagsPage({ globalData, tags }) {
           <h1 className="mt-5 text-[clamp(2.6rem,8vw,4.4rem)] leading-[0.94]">
             Tags
           </h1>
-          <p className="mx-auto mt-5 max-w-[40rem] text-[15px] leading-8 text-neutral-600 dark:text-white/60 sm:text-lg">
-            所有主题按标签整理，适合沿着同一条知识线继续往下读。
-          </p>
         </section>
 
         <section className="mt-14 border-t border-black/8 pt-8 dark:border-white/10 sm:mt-20 sm:pt-10">
