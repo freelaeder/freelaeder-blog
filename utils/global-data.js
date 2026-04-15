@@ -7,7 +7,7 @@ export const getGlobalData = () => {
     : 'freelaeder';
   const blogDescription = process.env.BLOG_DESCRIPTION
     ? decodeURI(process.env.BLOG_DESCRIPTION)
-    : '我打碎了夕阳，散做漫天的星光。';
+    : '我打碎了夕阳，散做漫天星光。';
   const footerText = process.env.BLOG_FOOTER_TEXT
     ? decodeURI(process.env.BLOG_FOOTER_TEXT)
     : 'Since 2020 · freelaeder';
