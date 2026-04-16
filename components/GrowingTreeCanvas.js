@@ -110,9 +110,9 @@ const createBranch = ({
       durationMs ||
       clamp(
         length *
-          (isPrimary ? 14.5 : depth === 0 ? 11.5 : depth <= 2 ? 9 : 7.2),
-        isPrimary ? 2400 : 420,
-        isPrimary ? 4200 : 1850
+          (isPrimary ? 18 : depth === 0 ? 15 : depth <= 2 ? 11 : depth <= 4 ? 8 : 6),
+        isPrimary ? 3000 : depth === 0 ? 800 : 350,
+        isPrimary ? 5000 : depth === 0 ? 2200 : 1600
       ),
     spawned: false,
     startAt,
@@ -607,7 +607,10 @@ export default function GrowingTreeCanvas() {
       growingBranches.forEach((branch) => {
         const previousProgress = branch.progress;
         branch.elapsedMs = Math.min(branch.durationMs, branch.elapsedMs + deltaMs);
-        branch.progress = Math.min(1, branch.elapsedMs / branch.durationMs);
+
+        // 使用缓动函数：开始慢，后面加快（ease-in）
+        const linearProgress = branch.elapsedMs / branch.durationMs;
+        branch.progress = Math.min(1, linearProgress * linearProgress);
 
         drawBranchSegment(
           context,
