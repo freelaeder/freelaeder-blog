@@ -225,8 +225,12 @@ const spawnChildren = (branch, random, budget, currentTimeMs) => {
     twigCount = 2 + (random() > 0.55 ? 1 : 0);
   } else if (branch.depth <= 4) {
     twigCount = 1 + (random() > 0.2 ? 1 : 0) + (random() > 0.86 ? 1 : 0);
-  } else if (random() > 0.42) {
-    twigCount = 1 + (random() > 0.82 ? 1 : 0);
+  } else if (branch.depth <= 6) {
+    // 增加中层树枝密度
+    twigCount = 1 + (random() > 0.3 ? 1 : 0) + (random() > 0.7 ? 1 : 0);
+  } else if (random() > 0.3) {
+    // 增加末梢树枝密度
+    twigCount = 1 + (random() > 0.6 ? 1 : 0) + (random() > 0.85 ? 1 : 0);
   }
 
   for (let index = 0; index < twigCount; index += 1) {
@@ -253,7 +257,7 @@ const spawnChildren = (branch, random, budget, currentTimeMs) => {
 
   if (branch.depth >= 5 && branch.length > MIN_LENGTH * 1.15) {
     const tipTwigCount =
-      2 + (random() > 0.44 ? 1 : 0) + (random() > 0.82 ? 1 : 0);
+      3 + (random() > 0.35 ? 1 : 0) + (random() > 0.65 ? 1 : 0) + (random() > 0.85 ? 1 : 0);
 
     for (let index = 0; index < tipTwigCount; index += 1) {
       const direction = index % 2 === 0 ? -1 : 1;
@@ -341,9 +345,9 @@ const CLUSTER_PRESETS = [
     y: 0.68,
     angle: -0.2,
     angleJitter: 0.2,
-    lengthFactor: 0.3,
-    maxLengthScale: 0.5,
-    width: 1.05,
+    lengthFactor: 0.22,
+    maxLengthScale: 0.38,
+    width: 0.85,
     alpha: 1,
     isPrimary: true,
     startAt: 120,
@@ -358,9 +362,9 @@ const CLUSTER_PRESETS = [
     y: 0.48,
     angle: 0.02,
     angleJitter: 0.18,
-    lengthFactor: 0.24,
-    maxLengthScale: 0.42,
-    width: 0.88,
+    lengthFactor: 0.18,
+    maxLengthScale: 0.32,
+    width: 0.7,
     alpha: 0.86,
     startAt: 3200,
     companionChance: 0.74,
@@ -374,9 +378,9 @@ const CLUSTER_PRESETS = [
     y: 0.22,
     angle: 0.48,
     angleJitter: 0.24,
-    lengthFactor: 0.17,
-    maxLengthScale: 0.32,
-    width: 0.58,
+    lengthFactor: 0.13,
+    maxLengthScale: 0.24,
+    width: 0.48,
     alpha: 0.7,
     startAt: 6000,
     companionChance: 0.42,
@@ -390,10 +394,11 @@ const CLUSTER_PRESETS = [
     y: 0.18,
     angle: Math.PI - 0.34,
     angleJitter: 0.16,
-    lengthFactor: 0.17,
-    maxLengthScale: 0.26,
-    width: 0.58,
+    lengthFactor: 0.13,
+    maxLengthScale: 0.24,
+    width: 0.48,
     alpha: 0.76,
+    isPrimary: true,
     startAt: 1800,
     companionChance: 0.72,
     companionXOffset: 0.006,
@@ -406,10 +411,11 @@ const CLUSTER_PRESETS = [
     y: 0.42,
     angle: Math.PI - 0.12,
     angleJitter: 0.18,
-    lengthFactor: 0.15,
-    maxLengthScale: 0.24,
-    width: 0.54,
+    lengthFactor: 0.18,
+    maxLengthScale: 0.32,
+    width: 0.7,
     alpha: 0.66,
+    isPrimary: true,
     startAt: 4700,
     companionChance: 0.62,
     companionXOffset: 0.006,
@@ -422,10 +428,11 @@ const CLUSTER_PRESETS = [
     y: 0.63,
     angle: Math.PI + 0.08,
     angleJitter: 0.18,
-    lengthFactor: 0.11,
-    maxLengthScale: 0.18,
-    width: 0.46,
+    lengthFactor: 0.22,
+    maxLengthScale: 0.38,
+    width: 0.85,
     alpha: 0.52,
+    isPrimary: true,
     startAt: 7600,
     companionChance: 0.38,
     companionXOffset: 0.004,
@@ -459,6 +466,7 @@ export default function GrowingTreeCanvas() {
     let lastTimestamp = 0;
     let currentTimeMs = 0;
     let primaryGrowthDone = false;
+    let initialRenderDone = false;
     const MAX_PARALLEL_GROWTH = 5;
 
     const getStrokePalette = () => {
@@ -516,37 +524,36 @@ export default function GrowingTreeCanvas() {
     const buildInitialBranches = (width, height, random) => {
       const usedIds = new Set();
       const clusters = [];
-      const leftPrimaryPresets = CLUSTER_PRESETS.filter((preset) =>
-        ['left-lower', 'left-middle'].includes(preset.id)
+      const leftPresets = CLUSTER_PRESETS.filter((preset) =>
+        ['left-lower', 'left-middle', 'left-upper'].includes(preset.id)
       );
-      const topAccentPresets = CLUSTER_PRESETS.filter((preset) =>
-        ['left-upper', 'right-upper'].includes(preset.id)
-      );
-      const sideAccentPresets = CLUSTER_PRESETS.filter((preset) =>
+      const rightPresets = CLUSTER_PRESETS.filter((preset) =>
         ['right-upper', 'right-middle', 'right-lower'].includes(preset.id)
       );
       const clusterCount = Math.min(MAX_CLUSTERS, 2 + (random() > 0.7 ? 1 : 0));
-      const firstPreset = pickUniquePreset(leftPrimaryPresets, usedIds, random);
+
+      // 随机选择从左侧还是右侧开始
+      const startFromLeft = random() > 0.5;
+      const primaryPool = startFromLeft ? leftPresets : rightPresets;
+      const secondaryPool = startFromLeft ? rightPresets : leftPresets;
+
+      // 选择主要的起始树枝
+      const firstPreset = pickUniquePreset(primaryPool, usedIds, random);
 
       if (firstPreset) {
         usedIds.add(firstPreset.id);
         clusters.push(firstPreset);
       }
 
-      const topPreset = pickUniquePreset(topAccentPresets, usedIds, random);
+      // 从另一侧选择次要树枝
+      const secondPreset = pickUniquePreset(secondaryPool, usedIds, random);
 
-      if (topPreset && clusters.length < clusterCount) {
-        usedIds.add(topPreset.id);
-        clusters.push(topPreset);
+      if (secondPreset && clusters.length < clusterCount) {
+        usedIds.add(secondPreset.id);
+        clusters.push(secondPreset);
       }
 
-      const sidePreset = pickUniquePreset(sideAccentPresets, usedIds, random);
-
-      if (sidePreset && clusters.length < clusterCount) {
-        usedIds.add(sidePreset.id);
-        clusters.push(sidePreset);
-      }
-
+      // 如果还需要更多，从所有剩余的选择
       while (clusters.length < clusterCount) {
         const preset = pickUniquePreset(CLUSTER_PRESETS, usedIds, random);
 
@@ -683,10 +690,11 @@ export default function GrowingTreeCanvas() {
       pendingBranches = buildInitialBranches(viewportWidth, viewportHeight, random);
       budget.count = pendingBranches.length;
 
-      if (reduceMotionQuery.matches) {
-        paintFinalTree();
-        return;
-      }
+      // 强制启用动画效果，忽略 prefers-reduced-motion
+      // if (reduceMotionQuery.matches) {
+      //   paintFinalTree();
+      //   return;
+      // }
 
       animationFrameId = window.requestAnimationFrame(drawFrame);
     };
@@ -696,7 +704,19 @@ export default function GrowingTreeCanvas() {
       resizeTimeoutId = window.setTimeout(renderTree, 100);
     };
 
-    renderTree();
+    // 延迟初始渲染，等待页面主要内容加载完成
+    const initRender = () => {
+      if (initialRenderDone) return;
+      initialRenderDone = true;
+      renderTree();
+    };
+
+    // 使用 requestIdleCallback 在浏览器空闲时渲染，如果不支持则延迟 500ms
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(initRender, { timeout: 1000 });
+    } else {
+      setTimeout(initRender, 500);
+    }
 
     const classObserver = new MutationObserver(() => {
       scheduleRender();
@@ -708,11 +728,17 @@ export default function GrowingTreeCanvas() {
     });
 
     const handleReduceMotionChange = () => {
-      scheduleRender();
+      if (initialRenderDone) {
+        scheduleRender();
+      }
     };
 
     reduceMotionQuery.addEventListener('change', handleReduceMotionChange);
-    window.addEventListener('resize', scheduleRender);
+    window.addEventListener('resize', () => {
+      if (initialRenderDone) {
+        scheduleRender();
+      }
+    });
 
     return () => {
       stopAnimation();
@@ -727,7 +753,7 @@ export default function GrowingTreeCanvas() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[1] hidden opacity-0 transition-opacity duration-700 xl:block"
+      className="pointer-events-none fixed inset-0 z-1 opacity-100 transition-opacity duration-700 xl:block"
       style={{
         filter: 'blur(0.12px)',
       }}
