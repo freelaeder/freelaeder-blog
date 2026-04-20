@@ -1,5 +1,36 @@
 export const featuredProjects = [
   {
+    id: 'diezhu-space',
+    eyebrow: 'Selected work',
+    year: '2026',
+    category: 'Interior design portfolio',
+    role: '独立完成信息架构、品牌表达与前端实现。',
+    title: '蝶筑空间',
+    description:
+      '一个面向高端家装设计展示的个人作品网站，围绕品牌塑造、案例呈现与客户转化来组织整体体验。',
+    summary:
+      '将首页品牌表达、作品集筛选、项目详情、关于介绍与联系预约整合到一套优雅克制的多页面作品站里。',
+    url: 'https://freelaeder-hdprofile.netlify.app/',
+    repoUrl: 'https://github.com/freelaeder/Hdprofile',
+    metrics: [
+      {
+        label: 'Architecture',
+        value: 'Multi-page',
+      },
+      {
+        label: 'Status',
+        value: 'Live',
+      },
+      {
+        label: 'Focus',
+        value: 'Client-ready',
+      },
+    ],
+    featureTags: ['作品筛选', '项目详情', '在线预约'],
+    stack: ['React 18', 'TypeScript', 'React Router 7', 'Tailwind CSS 4', 'Motion'],
+    note: '以设计师品牌展示为核心，强调高级感视觉、案例叙事和响应式浏览体验。',
+  },
+  {
     id: 'magic-pocket-bills',
     eyebrow: 'Selected work',
     year: '2026',
