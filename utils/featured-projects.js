@@ -1,5 +1,36 @@
 export const featuredProjects = [
   {
+    id: 'kids-points-app',
+    eyebrow: 'Selected work',
+    year: '2026',
+    category: 'Family task gamification',
+    role: '独立完成产品设计、双端体验梳理与前端实现。',
+    title: '家庭版孩子积分系统',
+    description:
+      '一个面向家庭任务激励场景的双端 Web 应用，围绕孩子执行任务、家长审核发放积分与愿望兑换建立完整闭环。',
+    summary:
+      '将孩子端任务执行、家长端任务管理、宠物互动、愿望胶囊与本地数据持久化整合为一套可直接体验的家庭积分系统。',
+    url: 'https://freelaeder-kids-points.netlify.app/',
+    repoUrl: 'https://github.com/freelaeder/kids-points-app',
+    metrics: [
+      {
+        label: 'Architecture',
+        value: 'Dual-portal',
+      },
+      {
+        label: 'Status',
+        value: 'Live',
+      },
+      {
+        label: 'Focus',
+        value: 'Gamified',
+      },
+    ],
+    featureTags: ['任务审核', '宠物互动', '愿望胶囊'],
+    stack: ['React 18', 'TypeScript', 'Vite', 'Dexie', 'Tailwind CSS'],
+    note: '采用 local-first 方案完成家庭任务积分主链路，重点强化亲子互动反馈与移动端可用性。',
+  },
+  {
     id: 'diezhu-space',
     eyebrow: 'Selected work',
     year: '2026',
