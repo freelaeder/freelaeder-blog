@@ -1,0 +1,25 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="32" fill="#F8F6F1"/>
+  <rect x="48" y="48" width="1104" height="534" rx="28" fill="#FFFDFC" stroke="#D7D0C2" stroke-width="2"/>
+  <rect x="82" y="92" width="420" height="446" rx="24" fill="#1F3A5F"/>
+  <rect x="540" y="92" width="578" height="132" rx="24" fill="#E8F0E3"/>
+  <rect x="540" y="244" width="278" height="132" rx="24" fill="#F8E6D0"/>
+  <rect x="840" y="244" width="278" height="132" rx="24" fill="#F1E2E2"/>
+  <rect x="540" y="396" width="578" height="142" rx="24" fill="#F3EFE8"/>
+  <text x="122" y="190" fill="#FFF7EA" font-family="Arial, sans-serif" font-size="54" font-weight="700">二手房交易</text>
+  <text x="122" y="260" fill="#FFF7EA" font-family="Arial, sans-serif" font-size="54" font-weight="700">避坑指南</text>
+  <text x="122" y="332" fill="#C9D7EA" font-family="Arial, sans-serif" font-size="28">中国大陆实战版</text>
+  <text x="122" y="384" fill="#C9D7EA" font-family="Arial, sans-serif" font-size="28">先保产权 再谈价格</text>
+  <circle cx="384" cy="438" r="58" fill="#F2C572"/>
+  <path d="M350 448L384 414L418 448V486H396V458H372V486H350V448Z" fill="#1F3A5F"/>
+  <text x="572" y="145" fill="#45603A" font-family="Arial, sans-serif" font-size="22" font-weight="700">优先级</text>
+  <text x="572" y="186" fill="#243124" font-family="Arial, sans-serif" font-size="32" font-weight="700">产权安全 &gt; 资金安全</text>
+  <text x="572" y="215" fill="#243124" font-family="Arial, sans-serif" font-size="24">房屋质量 &gt; 价格 &gt; 装修</text>
+  <text x="572" y="297" fill="#8A5A15" font-family="Arial, sans-serif" font-size="22" font-weight="700">验房</text>
+  <text x="572" y="338" fill="#3F2D15" font-family="Arial, sans-serif" font-size="24">漏水 / 水电 / 结构 / 小区</text>
+  <text x="872" y="297" fill="#8A3030" font-family="Arial, sans-serif" font-size="22" font-weight="700">交易</text>
+  <text x="872" y="338" fill="#402020" font-family="Arial, sans-serif" font-size="24">产权 / 抵押 / 租客 / 户口</text>
+  <text x="572" y="442" fill="#5F5032" font-family="Arial, sans-serif" font-size="22" font-weight="700">底线</text>
+  <text x="572" y="480" fill="#2E2A22" font-family="Arial, sans-serif" font-size="26">不查产权不交定金</text>
+  <text x="572" y="514" fill="#2E2A22" font-family="Arial, sans-serif" font-size="26">不走监管不交大额首付</text>
+</svg>

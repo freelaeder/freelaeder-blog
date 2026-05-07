@@ -10,6 +10,10 @@ import { getAllTags, getPostsByTagSlug } from '../../utils/tag-utils';
 const previewText = (summary = '') =>
   summary.length > 140 ? `${summary.slice(0, 140).trim()}...` : summary;
 
+const navigateToDocument = (url) => {
+  window.location.assign(url);
+};
+
 export default function TagPage({ globalData, tag, posts }) {
   return (
     <Layout contentClassName="max-w-[980px]">
@@ -45,6 +49,11 @@ export default function TagPage({ globalData, tag, posts }) {
               >
                 <Link
                   href={`/posts/${post.slug}`}
+                  prefetch={false}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    navigateToDocument(`/posts/${post.slug}`);
+                  }}
                   className="group grid gap-2 rounded-[1rem] px-3 py-5 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6 sm:py-6"
                 >
                   <div className="min-w-0">

@@ -64,15 +64,17 @@ const getResolvedTheme = () => {
 export default function Header({ name }) {
   const router = useRouter();
   const [theme, setTheme] = useState('light');
+  const [isThemeReady, setIsThemeReady] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
 
   useEffect(() => {
-    setTheme(getResolvedTheme());
-
     const htmlElement = document.documentElement;
-    const observer = new MutationObserver(() => {
+    const syncTheme = () => {
       setTheme(htmlElement.classList.contains('dark') ? 'dark' : 'light');
-    });
+      setIsThemeReady(true);
+    };
+    const frameId = window.requestAnimationFrame(syncTheme);
+    const observer = new MutationObserver(syncTheme);
 
     observer.observe(htmlElement, {
       attributes: true,
@@ -80,6 +82,7 @@ export default function Header({ name }) {
     });
 
     return () => {
+      window.cancelAnimationFrame(frameId);
       observer.disconnect();
     };
   }, []);
@@ -103,6 +106,14 @@ export default function Header({ name }) {
     localStorage.setItem('theme', nextTheme);
     setTheme(nextTheme);
   };
+
+  const themeToggleLabel = !isThemeReady
+    ? 'Toggle theme'
+    : theme === 'dark'
+      ? 'Use Light Mode'
+      : 'Use Dark Mode';
+
+  const themeToggleIcon = isThemeReady && theme === 'dark' ? sunIcon : moonIcon;
 
   return (
     <header
@@ -151,11 +162,11 @@ export default function Header({ name }) {
 
           <button
             type="button"
-            aria-label={theme === 'dark' ? 'Use Light Mode' : 'Use Dark Mode'}
+            aria-label={themeToggleLabel}
             onClick={toggleTheme}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/8 bg-transparent text-neutral-600 hover:border-black/14 hover:bg-black/[0.04] hover:text-neutral-950 dark:border-white/10 dark:text-white/65 dark:hover:border-white/16 dark:hover:bg-white/[0.07] dark:hover:text-white"
           >
-            {theme === 'dark' ? sunIcon : moonIcon}
+            {themeToggleIcon}
           </button>
         </div>
       </div>

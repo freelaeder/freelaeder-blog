@@ -1,5 +1,11 @@
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   DEFAULT_POSTS_PAGE_SIZE,
   getPostSummaries,
@@ -71,6 +77,10 @@ const waitForNextPaint = () =>
 const previewText = (summary = '') =>
   summary.length > 120 ? `${summary.slice(0, 120).trim()}...` : summary;
 
+const navigateToDocument = (url) => {
+  window.location.assign(url);
+};
+
 export default function Index({
   initialPosts,
   globalData,
@@ -116,7 +126,7 @@ export default function Index({
     }
   }, [activeSlug, posts]);
 
-  const getSavedTimelineState = () => {
+  const getSavedTimelineState = useCallback(() => {
     if (typeof window === 'undefined') {
       return {};
     }
@@ -126,9 +136,9 @@ export default function Index({
     } catch {
       return {};
     }
-  };
+  }, []);
 
-  const saveHomeTimelineState = (nextState = {}) => {
+  const saveHomeTimelineState = useCallback((nextState = {}) => {
     if (typeof window === 'undefined') {
       return;
     }
@@ -146,7 +156,7 @@ export default function Index({
         ...nextState,
       })
     );
-  };
+  }, [getSavedTimelineState]);
 
   const syncHeaderCompactState = (scrollTop = 0) => {
     window.dispatchEvent(
@@ -343,7 +353,7 @@ export default function Index({
     return () => {
       isCancelled = true;
     };
-  }, [loadMorePosts, pageSize]);
+  }, [getSavedTimelineState, loadMorePosts, pageSize]);
 
   useEffect(() => {
     const scrollContainer = document.getElementById('page-scroll-container');
@@ -377,7 +387,7 @@ export default function Index({
     return () => {
       scrollContainer.removeEventListener('scroll', handleContentScroll);
     };
-  }, [maybeLoadMoreOnScroll]);
+  }, [maybeLoadMoreOnScroll, saveHomeTimelineState]);
 
   useEffect(() => {
     const scrollContainer = document.getElementById('page-scroll-container');
@@ -453,9 +463,12 @@ export default function Index({
                         <Link
                           as={`/posts/${post.slug}`}
                           href={`/posts/${post.slug}`}
-                          onClick={() => {
+                          prefetch={false}
+                          onClick={(event) => {
+                            event.preventDefault();
                             setActiveSlug(post.slug);
                             saveHomeTimelineState({ activeSlug: post.slug });
+                            navigateToDocument(`/posts/${post.slug}`);
                           }}
                           className="group grid gap-2 rounded-[1rem] px-3 py-5 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-6 sm:py-6"
                         >

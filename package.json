@@ -17,9 +17,9 @@
     "dev": "node scripts/generate-post-pages.mjs && next",
     "dev:watch": "node scripts/generate-post-pages.mjs && next-remote-watch ./posts",
     "build": "node scripts/generate-post-pages.mjs && node scripts/generate-netlify-redirects.mjs && next build",
-    "start": "next start",
+    "start": "npx serve@latest out",
     "export": "next build",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "import:hexo": "node scripts/import-hexo-posts.mjs"
   },
   "dependencies": {
