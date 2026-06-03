@@ -1,0 +1,30 @@
+[
+  {
+    "id": "new-year-2027",
+    "title": "2027 新年",
+    "date": "2027-01-01",
+    "hint": "距离新的一年开始",
+    "backgroundColor": "#f3e3d6"
+  },
+  {
+    "id": "spring-festival-2027",
+    "title": "春节",
+    "date": "2027-02-06",
+    "hint": "距离团圆和春天",
+    "backgroundColor": "#d9eadf"
+  },
+  {
+    "id": "summer-solstice-2026",
+    "title": "夏至",
+    "date": "2026-06-21",
+    "hint": "距离白昼最长的一天",
+    "backgroundColor": "#dfe8f2"
+  },
+  {
+    "id": "-mpxsb7uw",
+    "title": "电子锁充电",
+    "date": "2026-12-02",
+    "hint": "距离电子锁充电的开始",
+    "backgroundColor": "#c8193c"
+  }
+]
