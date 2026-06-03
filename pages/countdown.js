@@ -272,7 +272,6 @@ export default function Countdown({ globalData, initialEvents }) {
   const [isEditorAvailable, setIsEditorAvailable] = useState(false);
   const [isCheckingEditor, setIsCheckingEditor] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
   const [editingId, setEditingId] = useState('');
@@ -301,11 +300,9 @@ export default function Countdown({ globalData, initialEvents }) {
         }
 
         setIsEditorAvailable(true);
-        setStatusMessage('本地写入服务已连接，保存会直接更新事件文件。');
       } catch {
         if (!controller.signal.aborted) {
           setIsEditorAvailable(false);
-          setStatusMessage('当前是只读展示模式。使用 npm run dev:countdown 启动本地写入服务后可编辑。');
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -323,7 +320,6 @@ export default function Countdown({ globalData, initialEvents }) {
 
   const saveEvents = async (nextEvents) => {
     setIsSaving(true);
-    setStatusMessage('');
 
     try {
       const response = await fetch(`${DATA_SERVER_URL}/events`, {
@@ -340,11 +336,9 @@ export default function Countdown({ globalData, initialEvents }) {
       }
 
       setEvents(payload.events);
-      setStatusMessage('已保存到 utils/countdown-events.json。');
       return true;
     } catch (error) {
       setFormError(error instanceof Error ? error.message : '保存事件失败。');
-      setStatusMessage('保存失败，请确认本地写入服务仍在运行。');
       return false;
     } finally {
       setIsSaving(false);
@@ -460,9 +454,6 @@ export default function Countdown({ globalData, initialEvents }) {
             </div>
 
             <div className="flex flex-col items-start gap-3 lg:items-end">
-              <p className="max-w-[24rem] text-sm leading-7 text-neutral-500 dark:text-white/48">
-                {isCheckingEditor ? '正在检测本地写入服务...' : statusMessage}
-              </p>
               {isEditorAvailable && (
                 <button
                   type="button"
