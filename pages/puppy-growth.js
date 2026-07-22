@@ -11,7 +11,8 @@ const growthGroupTemplates = [
     id: 'tiny-days',
     chapter: 'Chapter 01',
     title: '奶呼呼的初见',
-    period: '1—3 个月',
+    period: '0—3 个月',
+    maxAgeDays: 3 * 30,
     accent: '#ff7e8c',
     angle: '-4deg',
     top: '58px',
@@ -44,7 +45,8 @@ const growthGroupTemplates = [
     id: 'brave-days',
     chapter: 'Chapter 02',
     title: '好奇心大爆发',
-    period: '3—6 个月',
+    period: '3—12 个月',
+    maxAgeDays: 12 * 30,
     accent: '#5fc9b4',
     angle: '4deg',
     top: '320px',
@@ -78,6 +80,7 @@ const growthGroupTemplates = [
     chapter: 'Chapter 03',
     title: '长成阳光少年',
     period: '1 岁以后',
+    maxAgeDays: 100 * 12 * 30,
     accent: '#7b78e8',
     angle: '-3deg',
     top: '582px',
@@ -118,8 +121,11 @@ const entryDirections = [
 const visibleOffsets = [-1, 0, 1];
 const supportedImagePattern = /\.(?:avif|gif|jpe?g|jfif|png|svg|webp)$/i;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-const AGE_BASELINE_DATE = Date.UTC(2026, 6, 4);
-const AGE_BASELINE_DAYS = 30 + 12;
+const defaultAgeBaseline = {
+  date: '2026-07-04',
+  months: 1,
+  days: 12,
+};
 
 const wrapIndex = (value, length) => ((value % length) + length) % length;
 
@@ -145,13 +151,23 @@ const getNextPosition = (groups, groupIndex, imageIndexes, step) => {
   return { groupIndex: nextGroupIndex, imageIndexes: nextImageIndexes };
 };
 
-const calculatePuppyAge = (date = new Date()) => {
-  const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+const toUtcDate = (value) => {
+  if (typeof value === 'string') {
+    const [year, month, day] = value.split('-').map(Number);
+    return Date.UTC(year, month - 1, day);
+  }
+
+  return Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+};
+
+const calculatePuppyAge = (date = new Date(), baseline = defaultAgeBaseline) => {
+  const today = toUtcDate(date);
+  const baselineDate = toUtcDate(baseline.date);
   const elapsedDays = Math.max(
     0,
-    Math.round((today - AGE_BASELINE_DATE) / DAY_IN_MS)
+    Math.round((today - baselineDate) / DAY_IN_MS)
   );
-  const totalAgeDays = AGE_BASELINE_DAYS + elapsedDays;
+  const totalAgeDays = baseline.months * 30 + baseline.days + elapsedDays;
   const months = Math.floor(totalAgeDays / 30);
   const days = totalAgeDays % 30;
 
@@ -160,7 +176,22 @@ const calculatePuppyAge = (date = new Date()) => {
     days,
     daysToNextMonth: days === 0 ? 30 : 30 - days,
     isMonthBirthday: days === 0,
+    totalAgeDays,
   };
+};
+
+const formatPuppyAge = ({ months, days }) => {
+  if (months >= 12) {
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    return [
+      `${years}岁`,
+      remainingMonths > 0 ? `${remainingMonths}个月` : '',
+      days > 0 ? `${days}天` : '',
+    ].filter(Boolean).join('');
+  }
+
+  return `${months}个月${days > 0 ? `${days}天` : ''}`;
 };
 
 function ArrowIcon({ direction = 'right' }) {
@@ -420,7 +451,7 @@ function FullscreenShowcase({
   );
 }
 
-export default function PuppyGrowth({ globalData, groups }) {
+export default function PuppyGrowth({ ageBaseline, globalData, groups }) {
   const galleryRef = useRef(null);
   const [laneIndexes, setLaneIndexes] = useState(() => groups.map(() => 0));
   const [activeGroupIndex, setActiveGroupIndex] = useState(0);
@@ -517,7 +548,7 @@ export default function PuppyGrowth({ globalData, groups }) {
   }, [activeGroupIndex, groups, laneIndexes]);
 
   useEffect(() => {
-    const refreshAge = () => setPuppyAge(calculatePuppyAge());
+    const refreshAge = () => setPuppyAge(calculatePuppyAge(new Date(), ageBaseline));
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         refreshAge();
@@ -532,7 +563,7 @@ export default function PuppyGrowth({ globalData, groups }) {
       window.clearInterval(timer);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [ageBaseline]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -702,7 +733,7 @@ export default function PuppyGrowth({ globalData, groups }) {
                 sequence={gallerySequence}
               />
             ) : (
-              <div className={styles.galleryCanvas}>
+              <div className={styles.galleryCanvas} data-group-count={groups.length}>
                 <span className={styles.sunDoodle} aria-hidden="true" />
                 <span className={styles.starDoodle} aria-hidden="true" />
                 <span className={styles.wavyDoodle} aria-hidden="true" />
@@ -770,72 +801,125 @@ export default function PuppyGrowth({ globalData, groups }) {
 
 export function getStaticProps() {
   const imageRoot = path.join(process.cwd(), 'public', 'images', 'puppy-growth');
+  const ageRecordsPath = path.join(imageRoot, 'image-age-records.json');
   const naturalSort = new Intl.Collator('zh-CN', {
     numeric: true,
     sensitivity: 'base',
   });
+  const ageRecords = fs.existsSync(ageRecordsPath)
+    ? JSON.parse(fs.readFileSync(ageRecordsPath, 'utf8'))
+    : { baseline: defaultAgeBaseline, records: [] };
+  const ageBaseline = ageRecords.baseline || defaultAgeBaseline;
+  const normalizedRecords = Array.isArray(ageRecords.records)
+    ? ageRecords.records.map((record) => ({
+        ...record,
+        file: String(record.file || '').replace(/\\/g, '/'),
+      }))
+    : [];
+  const recordsByFile = new Map(
+    normalizedRecords.map((record) => [record.file.toLocaleLowerCase(), record])
+  );
+  const recordsBySequence = new Map(
+    normalizedRecords.map((record) => [Number(record.sequence), record])
+  );
   const knownImageCopy = new Map(
     growthGroupTemplates.flatMap((group) =>
       group.images.map((image) => [path.basename(image.src), image])
     )
   );
-  const readImageFiles = (directory) => {
-    if (!fs.existsSync(directory)) {
-      return [];
-    }
+  const readImageFiles = (directory, relativeDirectory = '') => {
+    if (!fs.existsSync(directory)) return [];
 
-    return fs
-      .readdirSync(directory, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && supportedImagePattern.test(entry.name))
-      .map((entry) => entry.name)
-      .sort((firstFile, secondFile) => naturalSort.compare(firstFile, secondFile));
+    return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+      const relativePath = [relativeDirectory, entry.name].filter(Boolean).join('/');
+      const absolutePath = path.join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        return readImageFiles(absolutePath, relativePath);
+      }
+
+      return entry.isFile() && supportedImagePattern.test(entry.name)
+        ? [relativePath]
+        : [];
+    });
   };
-  const groupFolderFiles = growthGroupTemplates.map((_, groupIndex) => ({
-    folder: `group-${groupIndex + 1}`,
-    files: readImageFiles(path.join(imageRoot, `group-${groupIndex + 1}`)),
-  }));
-  const usesGroupFolders = groupFolderFiles.some((group) => group.files.length > 0);
-  const rootFiles = usesGroupFolders ? [] : readImageFiles(imageRoot);
-  const filesPerGroup = Math.ceil(rootFiles.length / growthGroupTemplates.length);
-  const toGalleryImage = (fileName, folder, group, imageIndex) => {
-    const knownCopy = knownImageCopy.get(fileName);
-    const fileStem = path.parse(fileName).name;
+  const getNumericStem = (fileName) => {
+    const stem = path.parse(fileName).name;
+    return /^\d+$/.test(stem) ? Number(stem) : null;
+  };
+  const imageFiles = readImageFiles(imageRoot).sort((firstFile, secondFile) => {
+    const firstRecord =
+      recordsByFile.get(firstFile.toLocaleLowerCase()) ||
+      recordsBySequence.get(getNumericStem(firstFile));
+    const secondRecord =
+      recordsByFile.get(secondFile.toLocaleLowerCase()) ||
+      recordsBySequence.get(getNumericStem(secondFile));
+
+    if (firstRecord && secondRecord) {
+      return firstRecord.sequence - secondRecord.sequence;
+    }
+    if (firstRecord) return -1;
+    if (secondRecord) return 1;
+    return naturalSort.compare(firstFile, secondFile);
+  });
+  const scannedImages = imageFiles.map((fileName, imageIndex) => {
+    const numericStem = getNumericStem(fileName);
+    const record =
+      recordsByFile.get(fileName.toLocaleLowerCase()) ||
+      recordsBySequence.get(numericStem);
+    const sequence = Number(record?.sequence) || numericStem || imageIndex + 1;
+    const capturedOn = record?.capturedOn || null;
+    const puppyAge = capturedOn
+      ? calculatePuppyAge(capturedOn, ageBaseline)
+      : null;
+    const ageText = puppyAge
+      ? record?.age || formatPuppyAge(puppyAge)
+      : '日期待记录';
+    const baseName = path.basename(fileName);
+    const knownCopy = knownImageCopy.get(baseName);
+    const fileStem = path.parse(baseName).name;
     const readableName = fileStem
       .replace(/^\d+[-_.\s]*/, '')
       .replace(/[-_]+/g, ' ')
       .trim();
-    const encodedPath = [folder, fileName]
-      .filter(Boolean)
+    const encodedPath = fileName
+      .split('/')
       .map((segment) => encodeURIComponent(segment))
       .join('/');
 
     return {
-      id: `${group.id}-${imageIndex}-${fileStem}`,
+      id: `growth-${sequence}-${fileStem}`,
       src: `/images/puppy-growth/${encodedPath}`,
-      age: knownCopy?.age || `${group.period} · ${String(imageIndex + 1).padStart(2, '0')}`,
-      title: knownCopy?.title || readableName || `成长瞬间 ${imageIndex + 1}`,
-      note: knownCopy?.note || `${group.title}的第 ${imageIndex + 1} 个成长瞬间。`,
+      age: `${ageText} · ${String(sequence).padStart(2, '0')}`,
+      title: record?.title || knownCopy?.title || readableName || `成长瞬间 ${sequence}`,
+      note:
+        record?.note ||
+        knownCopy?.note ||
+        (capturedOn
+          ? `记录于 ${capturedOn.replace(/-/g, '.')}，那天 ${ageText}。`
+          : '尚未记录拍摄日期。'),
+      sequence,
+      totalAgeDays: puppyAge?.totalAgeDays || 0,
     };
-  };
+  });
   const scannedGroups = growthGroupTemplates
-    .map((group, groupIndex) => {
-      const folder = usesGroupFolders ? groupFolderFiles[groupIndex].folder : '';
-      const files = usesGroupFolders
-        ? groupFolderFiles[groupIndex].files
-        : rootFiles.slice(groupIndex * filesPerGroup, (groupIndex + 1) * filesPerGroup);
-
-      return {
-        ...group,
-        images: files.map((fileName, imageIndex) =>
-          toGalleryImage(fileName, folder, group, imageIndex)
-        ),
-      };
-    })
+    .map((group) => ({
+      ...group,
+      images: scannedImages
+        .filter((image) => {
+          const groupIndex = growthGroupTemplates.findIndex(
+            (template) => image.totalAgeDays < template.maxAgeDays
+          );
+          return growthGroupTemplates[groupIndex]?.id === group.id;
+        })
+        .map(({ totalAgeDays, ...image }) => image),
+    }))
     .filter((group) => group.images.length > 0);
   const groups = scannedGroups.length > 0 ? scannedGroups : growthGroupTemplates;
 
   return {
     props: {
+      ageBaseline,
       globalData: getGlobalData(),
       groups,
     },

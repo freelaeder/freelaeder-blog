@@ -14,13 +14,14 @@
     "url": "https://github.com/netlify-templates/nextjs-blog-theme/issues"
   },
   "scripts": {
-    "dev": "node scripts/generate-post-pages.mjs && next",
+    "dev": "node scripts/sync-puppy-growth-records.mjs && node scripts/generate-post-pages.mjs && next",
     "dev:countdown": "node scripts/dev-countdown.mjs",
     "countdown:data": "node scripts/countdown-data-server.mjs",
-    "dev:watch": "node scripts/generate-post-pages.mjs && next-remote-watch ./posts",
-    "build": "node scripts/generate-post-pages.mjs && node scripts/generate-netlify-redirects.mjs && next build",
+    "dev:watch": "node scripts/sync-puppy-growth-records.mjs && node scripts/generate-post-pages.mjs && next-remote-watch ./posts",
+    "build": "node scripts/sync-puppy-growth-records.mjs && node scripts/generate-post-pages.mjs && node scripts/generate-netlify-redirects.mjs && next build",
     "start": "npx serve@latest out",
-    "export": "next build",
+    "export": "node scripts/sync-puppy-growth-records.mjs && next build",
+    "puppy:sync": "node scripts/sync-puppy-growth-records.mjs",
     "lint": "eslint . --max-warnings=0",
     "import:hexo": "node scripts/import-hexo-posts.mjs"
   },
