@@ -292,6 +292,134 @@ function CarouselLane({
   );
 }
 
+function FullscreenThumbnail({ item, onSelect }) {
+  return (
+    <button
+      type="button"
+      className={styles.fullscreenThumbnail}
+      onClick={() => onSelect(item.groupIndex, item.imageIndex)}
+      aria-label={`切换到${item.image.title}`}
+    >
+      <img
+        src={item.image.src}
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+      <span>
+        <small>{item.group.chapter}</small>
+        <strong>{item.image.title}</strong>
+      </span>
+    </button>
+  );
+}
+
+function FullscreenShowcase({
+  activeGroup,
+  activeImage,
+  activeSequenceIndex,
+  directionStep,
+  groups,
+  isPlaying,
+  onAdvance,
+  onSelect,
+  onTogglePlay,
+  sequence,
+}) {
+  const getSequenceItem = (offset) =>
+    sequence[wrapIndex(activeSequenceIndex + offset, sequence.length)];
+  const previousItems = [-3, -2, -1].map(getSequenceItem);
+  const nextItems = [1, 2, 3].map(getSequenceItem);
+
+  return (
+    <div className={styles.fullscreenShowcase}>
+      <aside className={styles.fullscreenSide} aria-label="上一组成长图片">
+        <p className={styles.fullscreenSideLabel}>Previous</p>
+        <div
+          key={`previous-${activeImage.id}`}
+          className={`${styles.fullscreenThumbnailStack} ${styles.thumbnailStackUp}`}
+        >
+          {previousItems.map((item, index) => (
+            <FullscreenThumbnail
+              key={`previous-${item.image.id}-${index}`}
+              item={item}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      </aside>
+
+      <section className={styles.fullscreenCenter} aria-label="当前大图">
+        <div
+          key={`${activeImage.id}-${directionStep}`}
+          className={styles.fullscreenHeroVisual}
+        >
+          <img
+            src={activeImage.src}
+            alt={`${activeImage.age}，${activeImage.title}`}
+            loading="eager"
+            decoding="async"
+          />
+          <span className={styles.fullscreenGroupBadge}>{activeGroup.title}</span>
+          <div className={styles.fullscreenImageCopy}>
+            <p>{activeImage.age}</p>
+            <h2>{activeImage.title}</h2>
+            <span>{activeImage.note}</span>
+          </div>
+          <span className={styles.fullscreenCounter}>
+            {String(activeSequenceIndex + 1).padStart(2, '0')}
+            <i />
+            {String(sequence.length).padStart(2, '0')}
+          </span>
+        </div>
+
+        <div className={styles.fullscreenControlBar}>
+          <button type="button" onClick={() => onAdvance(-1)} aria-label="上一张图片" title="上一张 (←)">
+            <ArrowIcon direction="left" />
+          </button>
+          <button
+            type="button"
+            className={styles.fullscreenPlayButton}
+            onClick={onTogglePlay}
+            aria-label={isPlaying ? '暂停自动播放' : '继续自动播放'}
+            title={isPlaying ? '暂停 (空格)' : '播放 (空格)'}
+          >
+            <PlayIcon paused={!isPlaying} />
+          </button>
+          <button type="button" onClick={() => onAdvance(1)} aria-label="下一张图片" title="下一张 (→)">
+            <ArrowIcon />
+          </button>
+          <span className={styles.fullscreenControlDivider} aria-hidden="true" />
+          <div className={styles.fullscreenGroupProgress} aria-label={`当前第 ${activeGroup.groupIndex + 1} 组，共 ${groups.length} 组`}>
+            {groups.map((group, groupIndex) => (
+              <span
+                key={group.id}
+                className={groupIndex === activeGroup.groupIndex ? styles.fullscreenActiveGroup : undefined}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <aside className={styles.fullscreenSide} aria-label="接下来的成长图片">
+        <p className={styles.fullscreenSideLabel}>Up next</p>
+        <div
+          key={`next-${activeImage.id}`}
+          className={`${styles.fullscreenThumbnailStack} ${styles.thumbnailStackDown}`}
+        >
+          {nextItems.map((item, index) => (
+            <FullscreenThumbnail
+              key={`next-${item.image.id}-${index}`}
+              item={item}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 export default function PuppyGrowth({ globalData, groups }) {
   const galleryRef = useRef(null);
   const [laneIndexes, setLaneIndexes] = useState(() => groups.map(() => 0));
@@ -311,6 +439,29 @@ export default function PuppyGrowth({ globalData, groups }) {
   const totalImages = useMemo(
     () => groups.reduce((total, group) => total + group.images.length, 0),
     [groups]
+  );
+
+  const gallerySequence = useMemo(
+    () =>
+      groups.flatMap((group, groupIndex) =>
+        group.images.map((image, imageIndex) => ({
+          group: { ...group, groupIndex },
+          groupIndex,
+          image,
+          imageIndex,
+        }))
+      ),
+    [groups]
+  );
+
+  const activeSequenceIndex = useMemo(
+    () =>
+      gallerySequence.findIndex(
+        (item) =>
+          item.groupIndex === activeGroupIndex &&
+          item.imageIndex === laneIndexes[activeGroupIndex]
+      ),
+    [activeGroupIndex, gallerySequence, laneIndexes]
   );
 
   const advance = useCallback((step) => {
@@ -537,54 +688,69 @@ export default function PuppyGrowth({ globalData, groups }) {
               </button>
             </div>
 
-            <div className={styles.galleryCanvas}>
-              <span className={styles.sunDoodle} aria-hidden="true" />
-              <span className={styles.starDoodle} aria-hidden="true" />
-              <span className={styles.wavyDoodle} aria-hidden="true" />
+            {isFullscreen ? (
+              <FullscreenShowcase
+                activeGroup={{ ...groups[activeGroupIndex], groupIndex: activeGroupIndex }}
+                activeImage={activeImage}
+                activeSequenceIndex={activeSequenceIndex}
+                directionStep={directionStep}
+                groups={groups}
+                isPlaying={isPlaying}
+                onAdvance={advance}
+                onSelect={handleSelect}
+                onTogglePlay={() => setIsPlaying((current) => !current)}
+                sequence={gallerySequence}
+              />
+            ) : (
+              <div className={styles.galleryCanvas}>
+                <span className={styles.sunDoodle} aria-hidden="true" />
+                <span className={styles.starDoodle} aria-hidden="true" />
+                <span className={styles.wavyDoodle} aria-hidden="true" />
 
-              {groups.map((group, groupIndex) => (
-                <CarouselLane
-                  key={group.id}
-                  group={group}
-                  groupIndex={groupIndex}
-                  currentIndex={laneIndexes[groupIndex]}
-                  isSpotlight={activeGroupIndex === groupIndex}
-                  directionStep={directionStep}
-                  onSelect={handleSelect}
-                />
-              ))}
+                {groups.map((group, groupIndex) => (
+                  <CarouselLane
+                    key={group.id}
+                    group={group}
+                    groupIndex={groupIndex}
+                    currentIndex={laneIndexes[groupIndex]}
+                    isSpotlight={activeGroupIndex === groupIndex}
+                    directionStep={directionStep}
+                    onSelect={handleSelect}
+                  />
+                ))}
 
-              <div className={styles.playbackDock}>
-                <button type="button" onClick={() => advance(-1)} aria-label="上一组图片" title="上一张 (←)">
-                  <ArrowIcon direction="left" />
-                </button>
-                <button
-                  type="button"
-                  className={styles.playButton}
-                  onClick={() => setIsPlaying((current) => !current)}
-                  aria-label={isPlaying ? '暂停自动播放' : '继续自动播放'}
-                  title={isPlaying ? '暂停 (空格)' : '播放 (空格)'}
-                >
-                  <PlayIcon paused={!isPlaying} />
-                </button>
-                <button type="button" onClick={() => advance(1)} aria-label="下一组图片" title="下一张 (→)">
-                  <ArrowIcon />
-                </button>
-                <span className={styles.dockDivider} aria-hidden="true" />
-                <div className={styles.progressDots} aria-label={`当前第 ${activeGroupIndex + 1} 组，共 ${groups.length} 组`}>
-                  {groups.map((group, groupIndex) => (
-                    <button
-                      key={group.id}
-                      type="button"
-                      aria-label={`查看${group.title}`}
-                      aria-current={activeGroupIndex === groupIndex ? 'true' : undefined}
-                      className={activeGroupIndex === groupIndex ? styles.activeDot : undefined}
-                      onClick={() => setActiveGroupIndex(groupIndex)}
-                    />
-                  ))}
+                <div className={styles.playbackDock}>
+                  <button type="button" onClick={() => advance(-1)} aria-label="上一张图片" title="上一张 (←)">
+                    <ArrowIcon direction="left" />
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.playButton}
+                    onClick={() => setIsPlaying((current) => !current)}
+                    aria-label={isPlaying ? '暂停自动播放' : '继续自动播放'}
+                    title={isPlaying ? '暂停 (空格)' : '播放 (空格)'}
+                  >
+                    <PlayIcon paused={!isPlaying} />
+                  </button>
+                  <button type="button" onClick={() => advance(1)} aria-label="下一张图片" title="下一张 (→)">
+                    <ArrowIcon />
+                  </button>
+                  <span className={styles.dockDivider} aria-hidden="true" />
+                  <div className={styles.progressDots} aria-label={`当前第 ${activeGroupIndex + 1} 组，共 ${groups.length} 组`}>
+                    {groups.map((group, groupIndex) => (
+                      <button
+                        key={group.id}
+                        type="button"
+                        aria-label={`查看${group.title}`}
+                        aria-current={activeGroupIndex === groupIndex ? 'true' : undefined}
+                        className={activeGroupIndex === groupIndex ? styles.activeDot : undefined}
+                        onClick={() => setActiveGroupIndex(groupIndex)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <p className={styles.srOnly} aria-live="polite">
               正在高亮展示：{activeImage.age}，{activeImage.title}。{activeImage.note}
