@@ -119,7 +119,8 @@ const entryDirections = [
 ];
 
 const visibleOffsets = [-1, 0, 1];
-const supportedImagePattern = /\.(?:avif|gif|jpe?g|jfif|png|svg|webp)$/i;
+const supportedVideoPattern = /\.(?:m4v|mov|mp4|ogv|webm)$/i;
+const supportedMediaPattern = /\.(?:avif|gif|jpe?g|jfif|m4v|mov|mp4|ogv|png|svg|webm|webp)$/i;
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const defaultAgeBaseline = {
   date: '2026-07-04',
@@ -249,12 +250,59 @@ function PawMark() {
   );
 }
 
+function GalleryMedia({
+  isActive = false,
+  isPlaying = false,
+  item,
+  onEnded,
+  showControls = false,
+}) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (item.type !== 'video' || !isActive || !videoRef.current) return;
+
+    if (isPlaying) {
+      videoRef.current.play().catch(() => undefined);
+    } else {
+      videoRef.current.pause();
+    }
+  }, [isActive, isPlaying, item.src, item.type]);
+
+  if (item.type === 'video') {
+    return (
+      <video
+        ref={isActive ? videoRef : undefined}
+        src={item.src}
+        aria-label={`${item.age}，${item.title}`}
+        autoPlay={isActive && isPlaying}
+        controls={isActive && showControls}
+        muted
+        playsInline
+        preload={isActive ? 'auto' : 'metadata'}
+        onEnded={isActive ? onEnded : undefined}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={item.src}
+      alt={`${item.age}，${item.title}`}
+      loading={isActive ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  );
+}
+
 function CarouselLane({
   group,
   groupIndex,
   currentIndex,
   isSpotlight,
   directionStep,
+  isPlaying,
+  onMediaEnded,
   onSelect,
 }) {
   const direction = entryDirections[directionStep];
@@ -303,12 +351,15 @@ function CarouselLane({
                     : undefined
                 }
               >
-                <img
-                  src={image.src}
-                  alt={`${image.age}，${image.title}`}
-                  loading={isFocused ? 'eager' : 'lazy'}
-                  decoding="async"
+                <GalleryMedia
+                  item={image}
+                  isActive={isFocused}
+                  isPlaying={isPlaying}
+                  onEnded={onMediaEnded}
                 />
+                {image.type === 'video' ? (
+                  <i className={styles.mediaTypeBadge}>Video</i>
+                ) : null}
                 <span className={styles.ageBadge}>{image.age}</span>
                 <span className={styles.photoCopy}>
                   <strong>{image.title}</strong>
@@ -331,12 +382,10 @@ function FullscreenThumbnail({ item, onSelect }) {
       onClick={() => onSelect(item.groupIndex, item.imageIndex)}
       aria-label={`切换到${item.image.title}`}
     >
-      <img
-        src={item.image.src}
-        alt=""
-        loading="eager"
-        decoding="async"
-      />
+      <GalleryMedia item={item.image} />
+      {item.image.type === 'video' ? (
+        <i className={styles.mediaTypeBadge}>Video</i>
+      ) : null}
       <span>
         <small>{item.group.chapter}</small>
         <strong>{item.image.title}</strong>
@@ -384,12 +433,14 @@ function FullscreenShowcase({
         <div
           key={`${activeImage.id}-${directionStep}`}
           className={styles.fullscreenHeroVisual}
+          data-media-type={activeImage.type}
         >
-          <img
-            src={activeImage.src}
-            alt={`${activeImage.age}，${activeImage.title}`}
-            loading="eager"
-            decoding="async"
+          <GalleryMedia
+            item={activeImage}
+            isActive
+            isPlaying={isPlaying}
+            onEnded={() => onAdvance(1)}
+            showControls
           />
           <span className={styles.fullscreenGroupBadge}>{activeGroup.title}</span>
           <div className={styles.fullscreenImageCopy}>
@@ -542,9 +593,21 @@ export default function PuppyGrowth({ ageBaseline, globalData, groups }) {
       groups[nextPosition.groupIndex].images[
         nextPosition.imageIndexes[nextPosition.groupIndex]
       ];
+
+    if (nextImage.type === 'video') {
+      const preloadVideo = document.createElement('video');
+      preloadVideo.preload = 'metadata';
+      preloadVideo.src = nextImage.src;
+      return () => {
+        preloadVideo.removeAttribute('src');
+        preloadVideo.load();
+      };
+    }
+
     const preloadImage = new window.Image();
     preloadImage.decoding = 'async';
     preloadImage.src = nextImage.src;
+    return undefined;
   }, [activeGroupIndex, groups, laneIndexes]);
 
   useEffect(() => {
@@ -566,13 +629,13 @@ export default function PuppyGrowth({ ageBaseline, globalData, groups }) {
   }, [ageBaseline]);
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || activeImage.type === 'video') {
       return undefined;
     }
 
     const timer = window.setInterval(() => advance(1), 3800);
     return () => window.clearInterval(timer);
-  }, [advance, isPlaying]);
+  }, [activeImage.type, advance, isPlaying]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -746,6 +809,8 @@ export default function PuppyGrowth({ ageBaseline, globalData, groups }) {
                     currentIndex={laneIndexes[groupIndex]}
                     isSpotlight={activeGroupIndex === groupIndex}
                     directionStep={directionStep}
+                    isPlaying={isPlaying}
+                    onMediaEnded={() => advance(1)}
                     onSelect={handleSelect}
                   />
                 ))}
@@ -838,7 +903,7 @@ export function getStaticProps() {
         return readImageFiles(absolutePath, relativePath);
       }
 
-      return entry.isFile() && supportedImagePattern.test(entry.name)
+      return entry.isFile() && supportedMediaPattern.test(entry.name)
         ? [relativePath]
         : [];
     });
@@ -876,6 +941,7 @@ export function getStaticProps() {
       ? record?.age || formatPuppyAge(puppyAge)
       : '日期待记录';
     const baseName = path.basename(fileName);
+    const mediaType = supportedVideoPattern.test(baseName) ? 'video' : 'image';
     const knownCopy = knownImageCopy.get(baseName);
     const fileStem = path.parse(baseName).name;
     const readableName = fileStem
@@ -890,8 +956,13 @@ export function getStaticProps() {
     return {
       id: `growth-${sequence}-${fileStem}`,
       src: `/images/puppy-growth/${encodedPath}`,
+      type: mediaType,
       age: `${ageText} · ${String(sequence).padStart(2, '0')}`,
-      title: record?.title || knownCopy?.title || readableName || `成长瞬间 ${sequence}`,
+      title:
+        record?.title ||
+        knownCopy?.title ||
+        readableName ||
+        `${mediaType === 'video' ? '视频瞬间' : '成长瞬间'} ${sequence}`,
       note:
         record?.note ||
         knownCopy?.note ||

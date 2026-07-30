@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const imageRoot = path.join(rootDir, 'public', 'images', 'puppy-growth');
 const recordsPath = path.join(imageRoot, 'image-age-records.json');
-const supportedImagePattern = /\.(?:avif|gif|jpe?g|jfif|png|svg|webp)$/i;
+const supportedMediaPattern = /\.(?:avif|gif|jpe?g|jfif|m4v|mov|mp4|ogv|png|svg|webm|webp)$/i;
 const dayInMs = 24 * 60 * 60 * 1000;
 const defaultBaseline = { date: '2026-07-04', months: 1, days: 12 };
 const naturalSort = new Intl.Collator('zh-CN', { numeric: true, sensitivity: 'base' });
@@ -52,7 +52,7 @@ async function readImages(directory, relativeDirectory = '') {
 
     if (entry.isDirectory()) {
       files.push(...await readImages(absolutePath, relativePath));
-    } else if (entry.isFile() && supportedImagePattern.test(entry.name)) {
+    } else if (entry.isFile() && supportedMediaPattern.test(entry.name)) {
       files.push(relativePath);
     }
   }

@@ -581,11 +581,32 @@
 .photoCard:hover { filter: blur(0.4px) saturate(0.95); opacity: 0.9; }
 .photoCard:focus-visible { outline: 4px solid #26364d; outline-offset: 5px; filter: none; opacity: 1; }
 
-.photoCard img {
+.photoCard img,
+.photoCard video {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.photoCard video { pointer-events: none; }
+
+.mediaTypeBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 2px solid rgba(38, 54, 77, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 227, 111, 0.94);
+  padding: 5px 9px;
+  color: var(--ink);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  z-index: 4;
 }
 
 .ageBadge {
@@ -766,7 +787,8 @@
 .fullscreenThumbnail:hover::after { border-color: #ffe36f; }
 .fullscreenThumbnail:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 
-.fullscreenThumbnail img {
+.fullscreenThumbnail img,
+.fullscreenThumbnail video {
   display: block;
   width: 100%;
   height: 100%;
@@ -775,7 +797,9 @@
   transition: filter 220ms ease, transform 280ms ease;
 }
 
-.fullscreenThumbnail:hover img { filter: saturate(1); transform: scale(1.035); }
+.fullscreenThumbnail video { pointer-events: none; }
+.fullscreenThumbnail:hover img,
+.fullscreenThumbnail:hover video { filter: saturate(1); transform: scale(1.035); }
 
 .fullscreenThumbnail > span {
   position: absolute;
@@ -826,12 +850,15 @@
   animation: fullscreenHeroEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.fullscreenHeroVisual > img {
+.fullscreenHeroVisual > img,
+.fullscreenHeroVisual > video {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
+
+.fullscreenHeroVisual > video { background: #111827; }
 
 .fullscreenGroupBadge {
   position: absolute;
@@ -845,6 +872,7 @@
   color: var(--ink);
   font-size: 0.68rem;
   font-weight: 900;
+  z-index: 4;
 }
 
 .fullscreenImageCopy {
@@ -855,6 +883,15 @@
   background: linear-gradient(transparent, rgba(27, 39, 55, 0.9));
   padding: clamp(70px, 10vh, 130px) clamp(18px, 3vw, 44px) clamp(20px, 3vh, 38px);
   color: #fff;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.fullscreenHeroVisual[data-media-type='video'] .fullscreenImageCopy {
+  top: 0;
+  bottom: auto;
+  background: linear-gradient(rgba(17, 24, 39, 0.82), transparent);
+  padding: 66px clamp(18px, 3vw, 44px) 52px;
 }
 
 .fullscreenImageCopy p {
@@ -1002,6 +1039,8 @@
   .photoCard[data-center='true'] { transform: scale(0.96); }
   .photoCard[data-focused='true'] { box-shadow: 0 16px 35px rgba(38, 54, 77, 0.25), 0 0 0 3px var(--group-accent); transform: scale(1.08); }
   .ageBadge { top: 7px; left: 7px; padding: 4px 7px; font-size: 0.56rem; }
+  .mediaTypeBadge { top: 7px; right: 7px; padding: 4px 6px; font-size: 0.48rem; }
+  .fullscreenThumbnail .mediaTypeBadge { top: 4px; right: 4px; padding: 3px 5px; font-size: 0.42rem; }
   .photoCopy { padding: 28px 10px 8px; }
   .photoCopy strong { font-size: 0.7rem; }
   .playbackDock { bottom: 14px; }
