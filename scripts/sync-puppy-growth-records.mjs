@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,7 +60,7 @@ async function readImages(directory, relativeDirectory = '') {
   return files;
 }
 
-async function readRecordData() {
+async function readRecordData(recordsPath) {
   try {
     return JSON.parse(await fs.readFile(recordsPath, 'utf8'));
   } catch (error) {
@@ -71,9 +71,11 @@ async function readRecordData() {
   }
 }
 
-async function main() {
+export async function syncPuppyGrowthRecords(targetRoot = imageRoot) {
+  const imageRoot = path.resolve(targetRoot);
+  const recordsPath = path.join(imageRoot, 'image-age-records.json');
   await fs.mkdir(imageRoot, { recursive: true });
-  const recordData = await readRecordData();
+  const recordData = await readRecordData(recordsPath);
   const baseline = recordData.baseline || defaultBaseline;
   const records = Array.isArray(recordData.records) ? recordData.records : [];
   const images = (await readImages(imageRoot)).sort(naturalSort.compare);
@@ -140,7 +142,9 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  syncPuppyGrowthRecords().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

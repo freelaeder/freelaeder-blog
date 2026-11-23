@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>小狗成长照片 · 压缩工作台</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="workspace">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="小狗照片工作台首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><ellipse cx="16" cy="21" rx="7" ry="6"/><circle cx="7" cy="15" r="3"/><circle cx="13" cy="9" r="3"/><circle cx="20" cy="9" r="3"/><circle cx="25" cy="15" r="3"/></svg></span><span>小狗照片工作台</span></a>
+        <span class="local-badge"><i></i> 仅在本机处理</span>
+      </header>
+
+      <section class="intro" id="top" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">PUPPY GROWTH · IMAGE STUDIO</p>
+          <h1 id="page-title">让每一张成长<br class="mobile-only"/>照片轻一点。</h1>
+          <p class="intro-copy">批量整理小狗的成长影像。照片只在这台电脑上处理，原画质不会被静默替换。</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-halo"></div><div class="art-sun"></div>
+          <div class="art-photo art-photo-back"><span>growing<br/>together</span></div>
+          <div class="art-photo art-photo-front"><div class="art-hills"></div><svg viewBox="0 0 90 90"><ellipse cx="45" cy="60" rx="24" ry="18"/><circle cx="29" cy="42" r="10"/><circle cx="43" cy="30" r="10"/><circle cx="61" cy="34" r="10"/><circle cx="70" cy="48" r="9"/></svg></div>
+          <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✳</span>
+        </div>
+      </section>
+
+      <section class="source-card" aria-label="图片来源和压缩设置">
+        <div class="source-row"><span class="source-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4.4 7.7 12 12l7.6-4.3M12 12v9"/></svg></span><div class="source-info"><span class="section-kicker">本地图片文件夹</span><strong id="folder-path" class="path-text" aria-live="polite">正在连接本机文件夹…</strong></div><button type="button" id="refresh-button" class="icon-button" aria-label="重新扫描文件夹" title="重新扫描"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5.6 9a7 7 0 0 1 12.2-2L20 12M4 12l2.2 5a7 7 0 0 0 12.2-2"/></svg></button></div>
+        <div class="settings-row">
+          <label class="setting-field"><span>压缩质量</span><span class="quality-control"><input id="quality-setting" type="range" min="40" max="95" value="72" /><output for="quality-setting" id="quality-value">72</output></span><small>低一些，文件更轻</small></label>
+          <label class="setting-field edge-field"><span>图片最长边</span><span class="edge-control"><input id="edge-setting" type="number" min="256" max="10000" step="128" value="2560" /><span>px</span></span><small>输入 0 可保留原尺寸</small></label>
+        </div>
+        <p class="format-note"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><path d="M10 9v5m0-8v.2"/></svg> JPG、PNG 和 WebP 保持原格式；质量设置用于 JPG/WebP，PNG 无损优化并保留透明度。自动校正方向、清除 EXIF 与位置数据。</p>
+      </section>
+
+      <section class="content-card" aria-labelledby="gallery-heading">
+        <div class="content-heading">
+          <div><p class="eyebrow">YOUR PHOTO COLLECTION</p><h2 id="gallery-heading">成长照片 <span id="photo-count">—</span></h2></div>
+          <span id="selected-count" class="selected-count">已选 0 张</span>
+        </div>
+        <div id="drop-zone" class="drop-zone">
+          <span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 15V4m-4 4 4-4 4 4M4 15v5h16v-5"/></svg></span>
+          <span class="drop-copy"><strong>添加其他照片</strong><small>拖入 JPG、PNG 或 WebP，或从电脑中选择</small></span>
+          <button id="choose-files" class="button button-soft" type="button">选择照片</button>
+          <input id="file-picker" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple hidden />
+        </div>
+        <div class="toolbar">
+          <label class="select-all"><input type="checkbox" id="select-all"/><span class="checkmark"></span><span>全选当前列表</span></label>
+          <div class="toolbar-end"><label for="filter-input" class="sr-only">搜索文件名</label><div class="search-field"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><input type="search" id="filter-input" placeholder="搜索照片名称" autocomplete="off" /></div><div class="view-toggle" role="group" aria-label="显示方式"><button type="button" class="view-button active" data-view="grid" aria-label="网格显示" aria-pressed="true"><svg viewBox="0 0 20 20"><rect x="2.5" y="2.5" width="6" height="6" rx="1"/><rect x="11.5" y="2.5" width="6" height="6" rx="1"/><rect x="2.5" y="11.5" width="6" height="6" rx="1"/><rect x="11.5" y="11.5" width="6" height="6" rx="1"/></svg></button><button type="button" class="view-button" data-view="list" aria-label="列表显示" aria-pressed="false"><svg viewBox="0 0 20 20"><path d="M7 4h10M7 10h10M7 16h10M3 4h.1M3 10h.1M3 16h.1"/></svg></button></div></div>
+        </div>
+        <p id="drop-status" class="visually-hidden" aria-live="polite"></p>
+        <div id="photo-grid" class="photo-grid" aria-live="polite" aria-busy="true"><div class="loading-state"><span class="spinner"></span>正在读取成长照片…</div></div>
+        <div id="import-panel" class="import-panel" hidden></div>
+        <div class="bottom-bar"><span id="selection-summary">选择想要处理的照片</span><button id="compress-button" class="button button-primary" type="button" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m11.5 2-8 9h6l-1 7 8-10h-6z"/></svg><span>开始压缩</span><span class="button-count" id="button-count"></span></button></div>
+      </section>
+
+      <section id="progress-section" class="progress-section" aria-labelledby="progress-heading" hidden>
+        <div class="progress-heading"><div><p class="eyebrow">PROCESSING</p><h2 id="progress-heading">处理进度</h2></div><span id="progress-value" class="progress-value">0 / 0</span></div>
+        <div class="progress-track" role="progressbar" aria-label="图片压缩进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-fill"></span></div>
+        <p id="progress-current" class="progress-current" aria-live="polite">等待开始</p>
+        <div id="results-list" class="results-list"></div>
+        <div id="sync-status" class="sync-status" hidden aria-live="polite"></div>
+        <button type="button" class="button button-soft retry-sync" id="retry-sync" hidden>重试记录同步</button>
+      </section>
+
+      <footer class="footer"><span>照片保留原格式 · 元数据自动清理</span><span>为每段摇尾巴的时光留档</span></footer>
+    </main>
+
+    <dialog id="overwrite-dialog" class="confirm-dialog" aria-labelledby="dialog-title"><form method="dialog"><span class="dialog-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19zM12 9v5m0 3v.1"/></svg></span><h2 id="dialog-title">确认覆盖原图？</h2><p id="dialog-copy">只会替换压缩后确实变小、并且校验通过的照片。无法从此工具恢复原图。</p><div class="dialog-actions"><button type="submit" value="cancel" class="button button-soft">再想想</button><button type="submit" value="confirm" class="button button-danger" id="confirm-compress">继续压缩</button></div></form></dialog>
+    <dialog id="scope-dialog" class="confirm-dialog scope-dialog" aria-labelledby="scope-title"><form method="dialog"><span class="dialog-icon scope-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 4v4m8 2v4m-5 2v4"/></svg></span><h2 id="scope-title">选择本次处理范围</h2><p>目录内照片和新选择的照片分开处理，方便核对结果。</p><div class="scope-actions"><button type="submit" value="existing" class="scope-option"><strong>压缩成长目录照片</strong><small>尝试覆盖所选照片，开始前会再次确认</small></button><button type="submit" value="import" class="scope-option"><strong>导入新照片</strong><small>保存到目标文件夹，并自动避开重名</small></button><button type="submit" value="cancel" class="button button-soft scope-cancel">取消</button></div></form></dialog>
+  </body>
+</html>
